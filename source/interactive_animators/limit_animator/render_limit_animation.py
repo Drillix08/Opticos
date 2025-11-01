@@ -9,7 +9,8 @@ class limit_animation(Scene):
         self.approach = approach
         self.side = side
 
-    #Function that is graphed out and used to find output values at each frame
+    #Parses the string the user gave that represents the function 
+    #and returns its value when a particular value of x is plugged in
     def func(self, fstr, x, op):
         if isinstance(x, (np.float32, np.float64)):
             x = float(x)
@@ -70,7 +71,6 @@ class limit_animation(Scene):
         scale = 1
         backgroundColor = BLACK
         functionColor = self.color
-        #value_panel = Rectangle(width=6, height=config.frame_height, color="#0a0a4a", fill_color = "#0a0a4a", fill_opacity = 1).to_edge(LEFT).shift([-0.5, 0, 0])
 
         xRound = int(math.ceil(abs(self.approach)))
         yApproach = self.func(self.function, abs(self.approach), "+")
@@ -78,11 +78,6 @@ class limit_animation(Scene):
         boundScale = 5*(max(xRound, yRound) // 5 + 1)
         if ((self.approach < 0 and self.side == -1) or (self.approach > 0 and self.side == 1)):
             boundScale += 5
-        
-        leftBound = -2
-        rightBound = 18
-        bottomBound = -10
-        topBound = 10
 
         self.camera.background_color = backgroundColor
 
@@ -100,7 +95,6 @@ class limit_animation(Scene):
 
         graph_group = VGroup(ax, graph)
         graph_group.scale(scale) 
-        #graph_group.to_edge(RIGHT)
 
         #In manim, a value tracker is an object that displays a constantly updated value
         #By default it starts at some initial value and increases or decreases at a constant rate
@@ -136,8 +130,7 @@ class limit_animation(Scene):
         #The final values are manually set to slightly neater numbers that better explain the concept of a limit
         self.remove(x_value)
         self.remove(y_value)
-        #x_value = DecimalNumber(num_decimal_places = 5).to_edge(UL).shift([1, 0, 0]).set_value(-0.00001)
-        #y_value = DecimalNumber(num_decimal_places = 5).to_edge(UL).shift([1.8, -1, 0]).set_value(1.99999)
+    
         if self.func(self.function, self.approach + self.side*0.05, "+") > self.func(self.function, self.approach, "+"):
             offset = -1
         else:
