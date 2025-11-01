@@ -18,7 +18,8 @@ __**Linux:**__
 ```bash
 python3 -m venv .venv # or python -m venv .venv sometimes
 source .venv/bin/activate
-pip3 install manim```
+pip3 install manim
+```
 Download LaTeX (for Linux I reccomend using [TeX Live](https://tug.org/texlive/quickinstall.html))
 
 __**Windows:**__
@@ -41,6 +42,7 @@ brew install --cask basictex
 
 python3 -m venv .venv # or python -m venv .venv sometimes
 source .venv/bin/activate
-pip3 install manim```
+pip3 install manim
+```
 If done correctly, Opticos should be all set to run!
 
