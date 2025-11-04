@@ -2,15 +2,15 @@
 \usepackage{geometry, graphicx} % Required for inserting images
 
 \title{Opticos User Manual}
-\author{David Green}
-\date{October 2025}
+\author{Written by David Green}
+\date{}
 
 \begin{document}
 
 \maketitle
 
 \section*{Introduction}
-Hello and welcome to the Opticos user manual! In this manual we will be going over wat Opticos is, the different features that the program offers, and how to run each individual feature.
+Hello and welcome to the Opticos user manual! In this manual we will be going over what Opticos is, the different features that the program offers, and how to run each individual feature.
 
 \section*{What is Opticos?}
 Opticos is educational math tool with the goal of visually demonstrating complex math topics using precise computer animations. The name Opticos come from the greek word "optikos", which means visual. When we say that Opticos uses animations, we don't mean the kind used as children's entertainment. We mean the type of animations used in computer simulations, in which objects are moved in a precise way to visualize complex ideas.
@@ -57,6 +57,60 @@ It will take a little bit of time for the animation to render so wait a bit for 
 \includegraphics[width = 6in]{doneRendering.png}
 \\
 \\
-Note that at the bottom it may say "played $n$ animations". In this case it says "played 3 animations" That does not mean that 3 separate animation files were made, that just refers to the number of sub animations generated in the back end that make up the entire mp4 file, so you can just ignore it.
+Note that at the bottom it may say "played $n$ animations". In this case it says "played 3\\ animations" That does not mean that 3 separate animation files were made, that just refers to the number of sub animations generated in the back end that make up the entire mp4 file, so you can just ignore it.
+\pagebreak
+
+\subsection*{The Limit Animator}
+The first available interactive animator is the limit animator. The limit animator takes three input paramters:
+\begin{enumerate}
+    \item The function
+    \item The value you want x to approach
+    \item The side you want to approach that point from
+\end{enumerate}
+As of now, the only functions that are compatible with the limit animator are polynomials, which are functions of the form $a_nx^n + a_{n-1}x^{n-1} + ... + a_2x^2 + a_1x + a_0$. Also note that the polynomial must be in expanded form so although $(x + 2)^2$ is technically a polynomial, it must be written as $x^2 + 4x + 4$.\\
+\\
+For the approach value, it can be any real number, there's no restrictions. Note that extremely large numbers may significantly increase the rendering time for the animation.\\
+\\
+For the side you want the approach the point from, you can either enter -1 to approach it from the left or 1 to approach it from the right.\\
+\\
+Now what exactly does the actual animation look like. First, the function is plotted out on a graph. Then a point moves along the graph, approaching the value you entered as the second\\ parameter. On the side of the screen is a box that updates the x and y coordinates of the point every frame. The point then stops just before the approach value and the value of the limit is displayed on the screen.\\
+\\
+On the next pages are three example inputs for the limit animator.
+\pagebreak
+
+\subsubsection*{Example 1}
+Suppose we enter the following input values:\\
+\\
+\includegraphics[width=6in]{limitAnimatorInput1.png}\\
+\\
+This means that we want to make an animation for $\lim\limits_{x\to0^-}x^2$. Here's some images of what the output animation will look like.\\
+\\
+\includegraphics[width=4in]{limitAnimatorEx1Frame1.png}\\
+\\
+\includegraphics[width=4in]{limitanimatorEx1EndFrame.png}\\
+\pagebreak
+
+\subsubsection*{Example 2}
+Suppose we enter the following input values:\\
+\\
+\includegraphics[width=6in]{limitAnimatorInput2.png}\\
+\\
+This means that we want to make an animation for $\lim\limits_{x\to0.66^+}0.5x^3 - x^2 - 2x + 3$. Here's some images of what the output animation will look like.\\
+\\
+\includegraphics[width=4in]{limitAnimatorEx2Frame1.png}\\
+\\
+\includegraphics[width=4in]{limitanimatorEx2EndFrame.png}\\
+\pagebreak
+
+\subsubsection*{Example 3}
+Suppose we enter the following input values:\\
+\\
+\includegraphics[width=6in]{limitAnimatorInput3.png}\\
+\\
+This means that we want to make an animation for $\lim\limits_{x\to40^-}0.1x^2 - 2x - 15$. Here's some images of what the output animation will look like.\\
+\\
+\includegraphics[width=4in]{limitAnimatorEx3Frame1.png}\\
+\\
+\includegraphics[width=4in]{limitanimatorEx3EndFrame.png}\\
 
 \end{document}
