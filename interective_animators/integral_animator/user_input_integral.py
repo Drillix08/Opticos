@@ -1,10 +1,11 @@
 from manim import *
 import math
+
 # Controls the background color of the scene
 background_color = rgb_to_color((0.16, 0.16, 0.16))
 
 # Determines integral range to be solved for. Axis will automatically adjust to fit the range.
-integral_xRange = [-2, 2]
+integral_xRange = [-2, 2.5]
 
 # The color of integral estimate boxes that appear under the graph
 integral_box_color_outline = rgb_to_color((0.0, 0.0, 0.0))
@@ -27,4 +28,4 @@ box_of_area_under_curve_fill = rgb_to_color((0.6, 0.6, 0.0))
 function_color = rgb_to_color((0.2, 0.6, 0.8))
 def continuous_function(x):
     #return x**5-x
-    return math.sin(x - 1)
+    return 0.5*x**3 - x**2 - 2*x + 3

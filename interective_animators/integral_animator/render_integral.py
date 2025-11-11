@@ -91,18 +91,29 @@ class hello(Scene):
         return None
 
     # Copies all boxes in a range and makes them a different color to help with the area sum on the right
+    
+
     def copyAllBoxes(self, boxes):
         newBoxes = []
         for box in boxes:
-            newBoxes.append(box.copy())
-            # Change color depending on if its above or below the x axis
-            newBoxes[-1].set_color(userInfo.sum_of_integral_boxes_outline_positive)
-            newBoxes[-1].set_fill(userInfo.sum_of_integral_boxes_fill_positive, opacity=0)
-            if (newBoxes[-1].get_center()[1] < 0):
-                newBoxes[-1].set_color(userInfo.sum_of_integral_boxes_outline_negative)
-                newBoxes[-1].set_fill(userInfo.sum_of_integral_boxes_fill_negative, opacity=0)
-            newBoxes[-1].set_z_index(1)
+            box_copy = box.copy()
+            y_center = box_copy.get_center()[1]
+
+            # Decide sign based on position relative to the graph's x-axis
+            if y_center >= self.x_axis_y:
+                # Positive area
+                box_copy.set_color(userInfo.sum_of_integral_boxes_outline_positive)
+                box_copy.set_fill(userInfo.sum_of_integral_boxes_fill_positive, opacity=0)
+            else:
+                # Negative area
+                box_copy.set_color(userInfo.sum_of_integral_boxes_outline_negative)
+                box_copy.set_fill(userInfo.sum_of_integral_boxes_fill_negative, opacity=0)
+
+            box_copy.set_z_index(1)
+            newBoxes.append(box_copy)
+
         return newBoxes
+
 
     # Returns the new boxes that properly visualize the ratio between positive and negative area
     # This only returns new valid boxes, it does not animate them in or out.
@@ -153,6 +164,10 @@ class hello(Scene):
             y_length=7.4,
             axis_config={"include_numbers": True, "include_tip": False},
         ).move_to((-1.75,0,0))
+
+        # Store the screen y-coordinate of the x-axis
+        self.x_axis_y = ax.c2p(0, 0)[1]
+
         parabola = ax.plot(lambda x: func(x), new_x_range[0:2], color=BLUE)
         parabola.set_z_index(2)
 
