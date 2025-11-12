@@ -7,7 +7,7 @@ from scipy.integrate import quad
 # source manim-env/bin/activate
 # manim ./animation_prototypes/integrals/render_integral_animation.py
 
-class hello(Scene):
+class integral_animation(Scene):
     # Gets a value and returns the value clamped to the min and max y values
     # Used to prevent boxes from being rendered far off screen
     def clampYPos(self, value):
