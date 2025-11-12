@@ -12,6 +12,7 @@ class limit_animation(Scene):
     #Parses the string the user gave that represents the function 
     #and returns its value when a particular value of x is plugged in
     def func(self, fstr, x, op):
+        '''
         if isinstance(x, (np.float32, np.float64)):
             x = float(x)
         x = str(x)
@@ -63,8 +64,20 @@ class limit_animation(Scene):
                 total = total ** float(nums[i])
         
         return total
+        '''
+        return -1*x**2
+    
+    
              
     def construct(self):
+
+        #Custom version of the python range function but works with decimals
+        def float_range(start, stop, step):
+            vals = []
+            while start <= stop:
+                vals.append(round(start, 10))  # rounding avoids floating-point artifacts
+                start += step
+            return vals
 
         #-------------------------------------------------
         #Customizable parameters
@@ -72,22 +85,39 @@ class limit_animation(Scene):
         backgroundColor = BLACK
         functionColor = self.color
 
-        xRound = int(math.ceil(abs(self.approach)))
-        yApproach = self.func(self.function, abs(self.approach), "+")
-        yRound = int(math.ceil(yApproach))
-        boundScale = 5*(max(xRound, yRound) // 5 + 1)
+        '''
+        xBoundScale and yBoundScale are the lengths the graph extends in the x and y direction,
+        meaning the x axis goes from [-1*xBoundScale, xBoundScale] and the y axis goes from
+        #[-1*yBoundScale, yBoundScale]. 
+
+        The goal is to have the point being approahced to be on screen while also perserving the
+        shape of the function so that it's not over stretched or squished. To do this, the xBoundScale
+        is made to be a multiple of 5 whereas yBoundScale can vary depending on the height of the approach point
+        '''
+
+        xApproachRounded = int(math.ceil(abs(self.approach)))
+        yApproachRounded = int(math.ceil(abs(self.func(self.function, self.approach, "+"))))
+        xBoundScale = 5*(xApproachRounded//5 + 1)
+        #if approach point is zero make the y axis [-5, 5]
+        if (self.approach == 0):
+            yBoundScale = 5*(yApproachRounded//5 + 1)
+        else:
+            #multiplied by 1.25 because five tick marks will be made which will cause
+            #the hieght of the approach point to be around the second tick mark from the top
+            yBoundScale = 1.25*yApproachRounded
         if ((self.approach < 0 and self.side == -1) or (self.approach > 0 and self.side == 1)):
-            boundScale += 5
+            xBoundScale += 5
 
         self.camera.background_color = backgroundColor
 
         #initializes the x and y axes along with the range of values they display
         ax = Axes(
-            x_range=[-1*boundScale, boundScale, int(boundScale/5)], y_range=[-1*boundScale, boundScale, int(boundScale/5)], axis_config={"include_tip": True},
+            #x_range=[-1*xBoundScale, xBoundScale, int(xBoundScale/5)], y_range=[-1*yBoundScale, yBoundScale, int(yBoundScale/5)], axis_config={"include_tip": True},
+            x_range=[-1*xBoundScale, xBoundScale, int(xBoundScale/5)], y_range=[-1*yBoundScale, yBoundScale, yBoundScale/5], axis_config={"include_tip": True},
             x_length = 7,
             y_length = 7,
-            x_axis_config={"numbers_to_include": range(-1*boundScale, boundScale, int(boundScale/5))},  # Auto number x-axis
-            y_axis_config={"numbers_to_include": range(-1*boundScale, boundScale, int(boundScale/5))},  # Auto number y-axis
+            x_axis_config={"numbers_to_include": float_range(-1*xBoundScale, xBoundScale, int(xBoundScale/5))},  # Auto number x-axis
+            y_axis_config={"numbers_to_include": float_range(-1*yBoundScale, yBoundScale, yBoundScale/5)},  # Auto number y-axis
         )
         
         #Draw graph that plot out function defined by func()
@@ -99,7 +129,9 @@ class limit_animation(Scene):
         #In manim, a value tracker is an object that displays a constantly updated value
         #By default it starts at some initial value and increases or decreases at a constant rate
         #until it reaches it's defined ending value
-        xTracker = ValueTracker(4*(boundScale/5)*self.side)
+        startPoint = 4*(xBoundScale/5)*self.side
+        #startPoint = -2
+        xTracker = ValueTracker(startPoint)
 
         #Every frame the x and y value of the point gets updated by getting the current value of xTracker. The exact value gets directly displayed
         #for x and for y the value from the value tracker is plugged into the method func() and the output is what the y value gets set equal to
@@ -124,8 +156,9 @@ class limit_animation(Scene):
         self.add(ax, graph, dot, coordsRect, x_value, xText, y_value, functionText)
         
         #Run value tracker, starts from -4 and and at -0.05
-        self.play(xTracker.animate.set_value(self.approach + 0.05*self.side), run_time = 3)
-        
+        #speed = math.sqrt((startPoint - self.approach)**2 + (self.func(self.function, startPoint, "+") - self.func(self.function, self.approach, "+"))**2)/4
+        speed = 3
+        self.play(xTracker.animate.set_value(self.approach + 0.05*self.side), run_time = speed)
         #Since the actual values from the value tracker are a bit messy at the end (due to the nature of computer calculations)
         #The final values are manually set to slightly neater numbers that better explain the concept of a limit
         self.remove(x_value)

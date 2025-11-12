@@ -5,7 +5,7 @@ import math
 background_color = rgb_to_color((0.16, 0.16, 0.16))
 
 # Determines integral range to be solved for. Axis will automatically adjust to fit the range.
-integral_xRange = [0, 2]
+integral_xRange = [0.1, 3]
 
 # The color of integral estimate boxes that appear under the graph
 integral_box_color_outline = rgb_to_color((0.0, 0.0, 0.0))
@@ -27,6 +27,7 @@ box_of_area_under_curve_fill = rgb_to_color((0.6, 0.6, 0.0))
 # Controls function color and function
 function_color = rgb_to_color((0.2, 0.6, 0.8))
 def continuous_function(x):
+    #return x**2 - 1
     #return x**5-x
     return math.sin(x - 1)
     #return 1/x
