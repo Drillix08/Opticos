@@ -1,5 +1,6 @@
 from manim import *
 import math
+
 # Controls the background color of the scene
 background_color = rgb_to_color((0.16, 0.16, 0.16))
 

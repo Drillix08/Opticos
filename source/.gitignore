@@ -1,6 +1,8 @@
 # General
 __pycache__/
 media/
+.idea
+.DS_Store
 
 # For Nicholas
 manim-env/
