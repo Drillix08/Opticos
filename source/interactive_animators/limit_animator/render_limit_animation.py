@@ -65,7 +65,7 @@ class limit_animation(Scene):
         
         return total
         '''
-        return -1*x**2
+        return math.cos(2*x)
     
     
              

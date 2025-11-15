@@ -1,0 +1,71 @@
+[gd_scene load_steps=3 format=3 uid="uid://ca5c2jxweer7k"]
+
+[ext_resource type="Script" uid="uid://c037dy8d5bv6m" path="res://limit_animator_menu.gd" id="1_elnml"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1k30o"]
+bg_color = Color(0.06220401, 0.64109623, 0.9255163, 1)
+corner_radius_top_left = 64
+corner_radius_top_right = 64
+corner_radius_bottom_right = 64
+corner_radius_bottom_left = 64
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_elnml")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -324.0
+offset_right = 324.0
+offset_bottom = 196.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 64
+text = "Select an animator"
+
+[node name="limit animator button" type="Button" parent="."]
+layout_mode = 0
+offset_left = 223.0
+offset_top = 115.0
+offset_right = 921.0
+offset_bottom = 242.0
+theme_override_font_sizes/font_size = 64
+theme_override_styles/normal = SubResource("StyleBoxFlat_1k30o")
+text = "Limit Animator"
+
+[node name="derivative animator button" type="Button" parent="."]
+layout_mode = 0
+offset_left = 220.0
+offset_top = 283.0
+offset_right = 928.0
+offset_bottom = 410.0
+theme_override_font_sizes/font_size = 64
+theme_override_styles/normal = SubResource("StyleBoxFlat_1k30o")
+text = "Derivative Animator"
+
+[node name="integral animator button" type="Button" parent="."]
+layout_mode = 0
+offset_left = 222.0
+offset_top = 450.0
+offset_right = 930.0
+offset_bottom = 577.0
+theme_override_font_sizes/font_size = 64
+theme_override_styles/normal = SubResource("StyleBoxFlat_1k30o")
+text = "Integral Animator"
+
+[node name="interactive animator menu back button" type="Button" parent="."]
+layout_mode = 1
+offset_right = 184.0
+offset_bottom = 101.0
+theme_override_font_sizes/font_size = 42
+theme_override_styles/normal = SubResource("StyleBoxFlat_1k30o")
+text = "Back"
+
+[connection signal="pressed" from="interactive animator menu back button" to="." method="_on_interactive_animator_menu_back_button_pressed"]
