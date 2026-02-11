@@ -63,9 +63,7 @@ func _draw():
 	draw_line(Vector2(-origin.x, 300) + origin, Vector2(1000-origin.x, 300) + origin, Color(0.0, 0.0, 0.0, 1.0), 5.0)
 	
 	#Draw the function
-	var square_size = windowSize[0]/2.0
-	var rect = Rect2(convert_to_godot_coords(Vector2(-square_size, -square_size))-origin, Vector2(2*square_size, 2*square_size))
-	draw_function(rect, 0)
+	draw_function()
 
 #controlls the moving of the "camera" when you click and drag
 func _input(event):
@@ -78,12 +76,38 @@ func _input(event):
 		origin += delta
 		lastMousePos = event.position
 		queue_redraw()
-		
+
+func draw_function():
+	var windowSize :Vector2i = DisplayServer.window_get_size()
+	var square_size = windowSize[0]/2.0
+	var rect = Rect2(convert_to_godot_coords(Vector2(-square_size, -square_size))-origin, Vector2(2*square_size, 2*square_size))
+	var rects: Array[Rect2] = []
+	draw_function_impl(rect, rects, 0)
+	for i in range(rects.size()):
+		#draw_rect(rects[i], Color.RED)
+		draw_circle(rects[i].position+rects[i].size/2, 5, Color.RED)
+
 # recursively checks if the function passes through the square,
 # if it does, split the square into 4 more square, and check for each one
 # if it does not, end the recursion
 # the recursion ends when the depth reaches a currently hardcoded value (8 rn) and draws a rectangle
-func draw_function(rect: Rect2, depth: int):
+func draw_function_impl(rect: Rect2, rects: Array[Rect2], depth: int):
+	if is_in_rect(rect):
+		if(depth >= 8):
+			#draw_rect(rect, Color.RED)
+			rects.append(rect)
+		else:
+			var top_left = Rect2(rect.position, rect.size/2)
+			var top_right = Rect2(Vector2(rect.position[0]+rect.size[0]/2, rect.position[1]), rect.size/2)
+			var bottom_right = Rect2(rect.position+rect.size/2, rect.size/2)
+			var bottom_left = Rect2(Vector2(rect.position[0], rect.position[1]+rect.size[1]/2), rect.size/2)
+			draw_function_impl(top_left, rects, depth+1)
+			draw_function_impl(top_right, rects, depth+1)
+			draw_function_impl(bottom_right, rects, depth+1)
+			draw_function_impl(bottom_left, rects, depth+1)
+
+#checks if a function (currently hardcoded as x^2) passes through a given rectangle
+func is_in_rect(rect: Rect2):
 	var start = convert_to_real_coords(rect.position)
 	var end = convert_to_real_coords(rect.end)
 	var conversion = grid_spacing*major_every
@@ -91,27 +115,12 @@ func draw_function(rect: Rect2, depth: int):
 	var bottom: float = end[1]/conversion
 	var x_left: float = start[0]/conversion
 	var x_right: float = end[0]/conversion
-	if is_in_rect(bottom, top, x_left, x_right):
-		if(depth >= 8):
-			draw_rect(rect, Color.RED)
-		else:
-			var top_left = Rect2(rect.position, rect.size/2)
-			var top_right = Rect2(Vector2(rect.position[0]+rect.size[0]/2, rect.position[1]), rect.size/2)
-			var bottom_right = Rect2(rect.position+rect.size/2, rect.size/2)
-			var bottom_left = Rect2(Vector2(rect.position[0], rect.position[1]+rect.size[1]/2), rect.size/2)
-			draw_function(top_left, depth+1)
-			draw_function(top_right, depth+1)
-			draw_function(bottom_right, depth+1)
-			draw_function(bottom_left, depth+1)
-
-#checks if a function (currently hardcoded as x^2) passes through a given rectangle
-func is_in_rect(lowerbound, upperbound, left, right):
-	var i: float = left
-	while i <= right:
-		var y = i**2
-		if (lowerbound <= y) && (y <= upperbound):
+	var x: float = x_left
+	while x <= x_right:
+		var y = x**2
+		if (bottom <= y) && (y <= top):
 			return true
-		i += 0.001
+		x += 0.001
 	return false
 
 # this function converts godot coordinates to the equivilent in an xy plane
