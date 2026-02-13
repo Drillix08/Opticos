@@ -54,8 +54,12 @@ func _draw():
 		draw_line(Vector2(xOffset-5*grid_spacing, y+yOffset), Vector2(2*windowSize.x+xOffset-5*grid_spacing, y+yOffset), color)
 	
 	#Draw the x and y axes
-	draw_line(Vector2(500, -origin.y) + origin, Vector2(500, 700-origin.y) + origin, Color(0.0, 0.0, 0.0, 1.0), 5.0)
-	draw_line(Vector2(0, 300 + origin.y), Vector2(1000-origin.x, 300) + origin, Color(0.0, 0.0, 0.0, 1.0), 5.0)
+	draw_line(Vector2(0, 300 + origin.y), Vector2(1000, 300 + origin.y), Color(0.0, 0.0, 0.0, 1.0), 5.0)
+	draw_line(Vector2(500 + origin.x, 0), Vector2(500 + origin.x, 600), Color(0.0, 0.0, 0.0, 1.0), 5.0)
+	
+	var full_screen_rect: Rect2 = Rect2(Vector2(0,0), Vector2(windowSize.x, windowSize.y))
+	draw_rect(full_screen_rect, Color.RED)
+	LineRectMethod(origin, full_screen_rect, 10)
 
 #controlls the moving of the "camera" when you click and drag
 func _input(event):
@@ -68,3 +72,6 @@ func _input(event):
 		origin += delta
 		lastMousePos = event.position
 		queue_redraw()
+
+func LineRectMethod(origin: Vector2, rect: Rect2, maxSize: int):
+	pass
