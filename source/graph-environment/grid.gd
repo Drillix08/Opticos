@@ -63,18 +63,15 @@ func _draw():
 		draw_line(Vector2(480+origin.x, y+yOffset), Vector2(520+origin.x, y+yOffset), Color(0.0, 0.0, 0.0, 1.0), 5.0)
 	#Draw x-axis
 	draw_line(Vector2(-origin.x, 300) + origin, Vector2(1000-origin.x, 300) + origin, Color(0.0, 0.0, 0.0, 1.0), 5.0)
-<<<<<<< HEAD
 	
-	#Draw the function
-	draw_function()
-
-=======
 	#draw y-axis
 	draw_line(Vector2(500, -origin.y) + origin, Vector2(500, 700-origin.y) + origin, Color(0.0, 0.0, 0.0, 1.0), 5.0)
 	
+	#Draw the function
+	draw_function()
 	
 	
->>>>>>> origin/main
+	
 #controlls the moving of the "camera" when you click and drag
 func _input(event):
 	if event is InputEventMouseButton\
@@ -95,7 +92,7 @@ func draw_function():
 	draw_function_impl(rect, rects, 0)
 	for i in range(rects.size()):
 		#draw_rect(rects[i], Color.RED)
-		draw_circle(rects[i].position+rects[i].size/2, 5, Color.RED)
+		draw_circle(rects[i].position+rects[i].size/2, 3, Color.RED)
 
 # recursively checks if the function passes through the square,
 # if it does, split the square into 4 more square, and check for each one
