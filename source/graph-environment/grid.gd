@@ -31,7 +31,7 @@ func _draw():
 	var windowSize :Vector2i = DisplayServer.window_get_size()
 	
 	#Draw the vertical lines of the grid
-	for x in range(0, 2*(int(windowSize.x)), grid_spacing):
+	for x in range(0, 2*(int(windowSize.x)), 5*grid_spacing):
 		var color := Color(0.3, 0.3, 0.3)
 		@warning_ignore("integer_division")
 		if (x / grid_spacing) % major_every == 0:
@@ -41,11 +41,12 @@ func _draw():
 		var refreshedPosition :Array = refresh_pixel_positions(origin.x, origin.y)
 		var xOffset :float = refreshedPosition[0]
 		var yOffset :float = refreshedPosition[1]
-		#Draw y-axis
+		#draw vertical gridline
 		draw_line(Vector2(x+xOffset, yOffset-5*grid_spacing), Vector2(x+xOffset, 2*windowSize.y+yOffset-5*grid_spacing), color)
-
+		#draw an x-axis tick
+		draw_line(Vector2(x+xOffset, 280+origin.y), Vector2(x+xOffset, 320+origin.y), Color(0.0, 0.0, 0.0, 1.0), 5.0)
 	#Draw the horizontal lines of the grid
-	for y in range(0, 2*(int(windowSize.y)), grid_spacing):
+	for y in range(0, 2*(int(windowSize.y)), 5*grid_spacing):
 		var color := Color(0.3, 0.3, 0.3)
 		@warning_ignore("integer_division")
 		if (y / grid_spacing) % major_every == 0:
@@ -55,13 +56,18 @@ func _draw():
 		var refreshedPosition :Array = refresh_pixel_positions(origin.x, origin.y)
 		var xOffset :float = refreshedPosition[0]
 		var yOffset :float = refreshedPosition[1]
-		#Draw x-axis
+		#Draw horizontal gridline
 		draw_line(Vector2(xOffset-5*grid_spacing, y+yOffset), Vector2(2*windowSize.x+xOffset-5*grid_spacing, y+yOffset), color)
-	
-	#Draw the x and y axes
-	draw_line(Vector2(500, -origin.y) + origin, Vector2(500, 700-origin.y) + origin, Color(0.0, 0.0, 0.0, 1.0), 5.0)
+		#draw a y-axis tick
+		#draw an x-axis tick
+		draw_line(Vector2(480+origin.x, y+yOffset), Vector2(520+origin.x, y+yOffset), Color(0.0, 0.0, 0.0, 1.0), 5.0)
+	#Draw x-axis
 	draw_line(Vector2(-origin.x, 300) + origin, Vector2(1000-origin.x, 300) + origin, Color(0.0, 0.0, 0.0, 1.0), 5.0)
-
+	#draw y-axis
+	draw_line(Vector2(500, -origin.y) + origin, Vector2(500, 700-origin.y) + origin, Color(0.0, 0.0, 0.0, 1.0), 5.0)
+	
+	
+	
 #controlls the moving of the "camera" when you click and drag
 func _input(event):
 	if event is InputEventMouseButton\
