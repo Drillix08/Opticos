@@ -1,7 +1,7 @@
 extends Control
 
-@export var grid_spacing :int = 20
-@export var major_every :int = 5
+@export var grid_spacing :int = 100
+@export var gridline_thickness :float = 1.0
 
 var isDragging :bool = false
 var lastMousePos := Vector2.ZERO
@@ -14,16 +14,16 @@ the x or y pixel positions are reset to what they originally
 were at when the origin was at (0, 0), otherwise does nothing
 '''
 func refresh_pixel_positions(xOffset, yOffset):
-	while (abs(xOffset) > 5*grid_spacing):
+	while (abs(xOffset) > grid_spacing):
 		if (xOffset > 0):
-			xOffset -= 5*grid_spacing
+			xOffset -= grid_spacing
 		if (xOffset < 0):
-			xOffset += 5*grid_spacing
-	while (abs(yOffset) > 5*grid_spacing):
+			xOffset += grid_spacing
+	while (abs(yOffset) > grid_spacing):
 		if (yOffset > 0):
-			yOffset -= 5*grid_spacing
+			yOffset -= grid_spacing
 		if (yOffset < 0):
-			yOffset += 5*grid_spacing
+			yOffset += grid_spacing
 			
 	return [xOffset, yOffset]
 
@@ -31,46 +31,38 @@ func _draw():
 	var windowSize :Vector2i = DisplayServer.window_get_size()
 	
 	#Draw the vertical lines of the grid
-	for x in range(0, 2*(int(windowSize.x)), 5*grid_spacing):
-		var color := Color(0.3, 0.3, 0.3)
-		@warning_ignore("integer_division")
-		if (x / grid_spacing) % major_every == 0:
-			color = Color(0.5, 0.5, 0.5)
+	for x in range(0, 2*(int(windowSize.x)), grid_spacing):
+		var color = Color(0.5, 0.5, 0.5)
 		#offset values the pixel positions of the graph objects 
 		#have from their original positions when the origin was at initialization
 		var refreshedPosition :Array = refresh_pixel_positions(origin.x, origin.y)
 		var xOffset :float = refreshedPosition[0]
 		var yOffset :float = refreshedPosition[1]
 		#draw vertical gridline
-		draw_line(Vector2(x+xOffset, yOffset-5*grid_spacing), Vector2(x+xOffset, 2*windowSize.y+yOffset-5*grid_spacing), color)
+		draw_line(Vector2(x+xOffset, yOffset-grid_spacing), Vector2(x+xOffset, 2*windowSize.y+yOffset-grid_spacing), color, gridline_thickness)
 		#draw an x-axis tick
-		draw_line(Vector2(x+xOffset, 280+origin.y), Vector2(x+xOffset, 320+origin.y), Color(0.0, 0.0, 0.0, 1.0), 5.0)
+		draw_line(Vector2(x+xOffset, 280+origin.y), Vector2(x+xOffset, 320+origin.y), Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
 	#Draw the horizontal lines of the grid
-	for y in range(0, 2*(int(windowSize.y)), 5*grid_spacing):
-		var color := Color(0.3, 0.3, 0.3)
-		@warning_ignore("integer_division")
-		if (y / grid_spacing) % major_every == 0:
-			color = Color(0.5, 0.5, 0.5)
+	for y in range(0, 2*(int(windowSize.y)), grid_spacing):
+		var color = Color(0.5, 0.5, 0.5)
 		#offset values the pixel positions of the graph objects 
 		#have from their original positions when the origin was at initialization
 		var refreshedPosition :Array = refresh_pixel_positions(origin.x, origin.y)
 		var xOffset :float = refreshedPosition[0]
 		var yOffset :float = refreshedPosition[1]
 		#Draw horizontal gridline
-		draw_line(Vector2(xOffset-5*grid_spacing, y+yOffset), Vector2(2*windowSize.x+xOffset-5*grid_spacing, y+yOffset), color)
+		draw_line(Vector2(xOffset-grid_spacing, y+yOffset), Vector2(2*windowSize.x+xOffset-grid_spacing, y+yOffset), color, gridline_thickness)
 		#draw a y-axis tick
-		#draw an x-axis tick
-		draw_line(Vector2(480+origin.x, y+yOffset), Vector2(520+origin.x, y+yOffset), Color(0.0, 0.0, 0.0, 1.0), 5.0)
+		draw_line(Vector2(480+origin.x, y+yOffset), Vector2(520+origin.x, y+yOffset), Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
 	#Draw x-axis
-	draw_line(Vector2(-origin.x, 300) + origin, Vector2(1000-origin.x, 300) + origin, Color(0.0, 0.0, 0.0, 1.0), 5.0)
 	
+
+	draw_line(Vector2(-origin.x, 300) + origin, Vector2(1000-origin.x, 300) + origin, Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
 	#draw y-axis
-	draw_line(Vector2(500, -origin.y) + origin, Vector2(500, 700-origin.y) + origin, Color(0.0, 0.0, 0.0, 1.0), 5.0)
-	
+	draw_line(Vector2(500, -origin.y) + origin, Vector2(500, 700-origin.y) + origin, Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
+
 	#Draw the function
 	draw_function()
-	
-	
 	
 #controlls the moving of the "camera" when you click and drag
 func _input(event):
@@ -117,7 +109,7 @@ func draw_function_impl(rect: Rect2, rects: Array[Rect2], depth: int):
 func is_in_rect(rect: Rect2):
 	var start = convert_to_real_coords(rect.position)
 	var end = convert_to_real_coords(rect.end)
-	var conversion = grid_spacing*major_every
+	var conversion = grid_spacing
 	var top: float = start[1]/conversion
 	var bottom: float = end[1]/conversion
 	var x_left: float = start[0]/conversion
