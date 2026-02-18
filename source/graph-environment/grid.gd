@@ -62,7 +62,9 @@ func _draw():
 	draw_line(Vector2(500, -origin.y) + origin, Vector2(500, 700-origin.y) + origin, Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
 
 	#Draw the function
-	draw_function()
+	draw_function(func(x):
+		return x**2
+	)
 	
 #controlls the moving of the "camera" when you click and drag
 func _input(event):
@@ -76,18 +78,17 @@ func _input(event):
 		lastMousePos = event.position
 		queue_redraw()
 
-func input_function(x: float):
-	return x**2
-
-func draw_function():
+## This function will draw the graph of the function specified by input_function
+## The argument of this function should be a function that takes a single argument x and returns y
+func draw_function(input_function: Callable):
 	var windowSize :Vector2i = DisplayServer.window_get_size()
 	var left = -(origin[0] + windowSize[0]/2.0)
 	var right = left + windowSize[0]
 	while(left < right-1):
 		var x0 = (left)/grid_spacing
 		var x1 = (left+1)/grid_spacing
-		var y0 = input_function(x0)
-		var y1 = input_function(x1)
+		var y0 = input_function.call(x0)
+		var y1 = input_function.call(x1)
 		x0 *= grid_spacing
 		x1 *= grid_spacing
 		y0 *= grid_spacing
@@ -95,15 +96,15 @@ func draw_function():
 		draw_line(convert_to_godot_coords(Vector2(x0, y0)), convert_to_godot_coords(Vector2(x1, y1)), Color.RED, 2)
 		left += 1
 
-# this function converts godot coordinates to the equivilent in an xy plane
-# for example, the top left of the screen which is normall (0,0) will become (-x,y)
+## this function converts Godot coordinates to the equivilent in an xy plane.
+## for example, the top left of the screen which is normally (0,0) will become (-x,y)
 func convert_to_real_coords(vec: Vector2):
 	var windowSize :Vector2 = DisplayServer.window_get_size()
 	var true_origin = Vector2(origin[0]+windowSize[0]/2, origin[1]+windowSize[1]/2)
 	return Vector2(vec[0]-true_origin[0], true_origin[1]-vec[1])
 	
-# this function converts xy coordinates to their equivalent in godot
-# for example, the origin which is normally (0, 0) would become (screenwidth/2, screenheight/2)
+## this function converts xy coordinates to their equivalent in Godot.
+## for example, the origin which is normally (0, 0) would become (screenwidth/2, screenheight/2)
 func convert_to_godot_coords(vec: Vector2):
 	var windowSize :Vector2 = DisplayServer.window_get_size()
 	var true_origin = Vector2(origin[0]+windowSize[0]/2, origin[1]+windowSize[1]/2)
