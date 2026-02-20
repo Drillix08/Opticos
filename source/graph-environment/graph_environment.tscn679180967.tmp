@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=3 uid="uid://dlgeh0w3vomer"]
+
+[ext_resource type="Script" uid="uid://ctkau5kfofefi" path="res://grid.gd" id="1_17ijq"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_17ijq")
+grid_spacing = null
+major_every = null
