@@ -63,7 +63,7 @@ func _draw():
 
 	#Draw the function
 	draw_function(func(x):
-		return x**2
+		return 5
 	)
 	
 #controlls the moving of the "camera" when you click and drag
