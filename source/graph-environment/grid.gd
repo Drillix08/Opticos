@@ -59,8 +59,8 @@ func _draw():
 	
 	var full_screen_rect: Rect2 = Rect2(Vector2(0,0), Vector2(windowSize.x, windowSize.y))
 	#var full_screen_rect: Rect2 = Rect2(Vector2(495,295) + origin, Vector2(10,10))
-	draw_rect(full_screen_rect, Color(255,0,0,.15))
-	LineRectMethod(full_screen_rect, 10, Color(255,0,0, .15))
+	draw_rect(full_screen_rect, Color(255,0,0,0))
+	LineRectMethod(full_screen_rect, 8, Color(255,0,0, 0))
 
 func _process(_delta: float):
 	queue_redraw()
@@ -77,15 +77,16 @@ func _input(event):
 		origin += delta
 		lastMousePos = event.position
 		queue_redraw()
-	print(origin)
 
 func LineRectMethod(rect: Rect2, maxSize: int, color: Color):
-	if(rect.size.x <= maxSize): return
-	var newColor = Color(color.r, color.g, color.b, color.a+.05)
+	if(maxSize == 0): return
+	var newColor = Color(color.r, color.g, color.b, color.a)
+	if(maxSize == 1): newColor.a += 1
 	var topLeft = Rect2(Vector2(rect.position.x, rect.position.y), rect.size/2)
 	var topRight = Rect2(Vector2(rect.position.x+rect.size.x/2, rect.position.y), rect.size/2)
 	var bottomLeft = Rect2(Vector2(rect.position.x, rect.position.y+rect.size.y/2), rect.size/2)
 	var bottomRight = Rect2(Vector2(rect.position.x+rect.size.x/2, rect.position.y+rect.size.y/2), rect.size/2)
+	maxSize -= 1
 	if(solutionIn(topLeft)): 
 		draw_rect(topLeft, newColor)
 		LineRectMethod(topLeft, maxSize, newColor)
@@ -104,9 +105,9 @@ func solutionIn(rect: Rect2) -> int:
 	#var topRightCoord = Vector2(rect.position.x - 500, -(rect.position.y+rect.size.y-300)) - origin
 	#var bottomLeftCoord = Vector2(rect.position.x+rect.size.x - 500, -(rect.position.y-300)) - origin
 	var bottomRightCoord = Vector2(rect.position.x-origin.x+rect.size.x - 500, -(rect.position.y-origin.y+rect.size.y-300))
-	if(topLeftCoord.x < topLeftCoord.y && bottomRightCoord.x < bottomRightCoord.y):
+	if(topLeftCoord.x*topLeftCoord.x < topLeftCoord.y && bottomRightCoord.x*bottomRightCoord.x < bottomRightCoord.y):
 		return 0
-	elif(topLeftCoord.x > topLeftCoord.y && bottomRightCoord.x > bottomRightCoord.y):
+	elif(topLeftCoord.x*topLeftCoord.x > topLeftCoord.y && bottomRightCoord.x*bottomRightCoord.x > bottomRightCoord.y):
 		return 0
 	else:
 		return 1
