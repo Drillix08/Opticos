@@ -60,10 +60,10 @@ func _draw():
 	draw_line(Vector2(-origin.x, 300) + origin, Vector2(1000-origin.x, 300) + origin, Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
 	#draw y-axis
 	draw_line(Vector2(500, -origin.y) + origin, Vector2(500, 700-origin.y) + origin, Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
-
+	
 	#Draw the function
 	draw_function(func(x):
-		return x**3-3*x-1
+		return tan(x)
 	)
 	
 #controlls the moving of the "camera" when you click and drag
@@ -82,19 +82,119 @@ func _input(event):
 ## The argument of this function should be a function that takes a single argument x and returns y
 func draw_function(input_function: Callable):
 	var windowSize :Vector2i = DisplayServer.window_get_size()
-	var left = -(origin[0] + windowSize[0]/2.0)
-	var right = left + windowSize[0]
-	while(left < right-1):
-		var x0 = (left)/grid_spacing
-		var x1 = (left+1)/grid_spacing
-		var y0 = input_function.call(x0)
-		var y1 = input_function.call(x1)
+	var left: float = -(origin.x + windowSize.x/2.0)
+	var right: float = left + windowSize.x
+	var top: float = origin.y + (windowSize.y / 2.0)
+	var bottom: float = origin.y - (windowSize.y / 2.0)
+
+	while(left < right):
+		var x0: float = (left)/grid_spacing
+		var x1: float = (left+1)/grid_spacing
+		var y0: float = input_function.call(x0)
+		var y1: float = input_function.call(x1)
+
+		# figure out the starting point of functions with a left-asymptote
+		if is_nan(y0) && !is_nan(y1):
+			var initialX = x1;
+			var initialY = y1;
+			var step: float = 1.0 / grid_spacing
+			for i in range(16):
+				step /= 2
+				# try moving x0 forward
+				x0 += step;
+				y0 = input_function.call(x0)
+				y1 = input_function.call(x1)
+				if absf(y0) == INF || absf(y1) == INF: break
+				if !is_nan(y0):
+					# Went too far
+					x0 -= step
+					x1 -= step
+			y0 = input_function.call(x0)
+			y1 = input_function.call(x1)
+			if is_nan(y0) || absf(y0) > absf(y1): 
+				y0 = y1 * INF
+				y1 = initialY
+				x1 = initialX
+			elif is_nan(y1) || absf(y1) > absf(y0):
+				y1 = y0 * INF
+				y0 = initialY
+				x0 = initialX
+
+		# figure out the starting point of functions with a right-asymptote
+		elif !is_nan(y0) && is_nan(y1):
+			var initialX = x1;
+			var initialY = y1;
+			var step: float = 1.0 / grid_spacing
+			for i in range(16):
+				step /= 2
+				# try moving x1 backward
+				x1 -= step;
+				y0 = input_function.call(x0)
+				y1 = input_function.call(x1)
+				if absf(y0) == INF || absf(y1) == INF: break
+				if !is_nan(y1):
+					# Went too far
+					x0 += step
+					x1 += step
+
+			y0 = input_function.call(x0)
+			y1 = input_function.call(x1)
+			if is_nan(y0) || absf(y0) > absf(y1): 
+				y0 = y1 * INF
+				y1 = initialY
+				x1 = initialX
+			elif is_nan(y1) || absf(y1) > absf(y0):
+				y1 = y0 * INF
+				y0 = initialY
+				x0 = initialX
+
+		# figure out other types of asymptotes
+		elif absf(y0 - y1) > 200:
+			var max_jump: float = absf(y0 - y1)
+			
+			var step: float = 1.0 / grid_spacing
+			for i in range(16):
+				step /= 2
+				# try to move x0 forward
+				x0 += step
+				y0 = input_function.call(x0)
+				y1 = input_function.call(x1)
+				
+				if absf(y0 - y1) > max_jump:
+					max_jump = absf(y0 - y1)
+					continue # Worked! So move on
+				
+				# Went too far, try moving x1 back instead
+				x0 -= step
+				x1 -= step
+				y0 = input_function.call(x0)
+				y1 = input_function.call(x1)
+				if absf(y0 - y1) > max_jump:
+					max_jump = absf(y0 - y1)
+					continue # Worked! So move on
+					
+				# Still too far, reset back to initial to try again
+				# With a smaller step size
+				x1 += step
+
+			# If we narrowed the jump down to a small enough step size,
+			# while still maintaing the size of the jump,
+			# then it's likely an asymptote
+			if x1 - x0 < 0.0001:
+				left += 1
+				continue
+		
+		# Actually drawing the line with the correct spacing:
 		x0 *= grid_spacing
 		x1 *= grid_spacing
 		y0 *= grid_spacing
 		y1 *= grid_spacing
+		if y0 == INF: y0 = top
+		if y0 == -INF: y0 = bottom
+		if y1 == INF: y1 = top
+		if y1 == -INF: y1 = bottom
 		draw_line(convert_to_godot_coords(Vector2(x0, y0)), convert_to_godot_coords(Vector2(x1, y1)), Color.RED, 2)
-		left += 1
+		left += 1;
 
 ## this function converts Godot coordinates to the equivilent in an xy plane.
 ## for example, the top left of the screen which is normally (0,0) will become (-x,y)
