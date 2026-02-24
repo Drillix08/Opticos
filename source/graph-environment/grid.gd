@@ -77,15 +77,18 @@ func _input(event):
 		origin += delta
 		lastMousePos = event.position
 		queue_redraw()
+	if event.is_action_pressed("ui_accept"):
+		animate_Limit(100, draw_function(func(x): return x*x))
 
 ## This function will draw the graph of the function specified by input_function
 ## The argument of this function should be a function that takes a single argument x and returns y
-func draw_function(input_function: Callable):
+func draw_function(input_function: Callable) -> Array[Vector2]:
 	var windowSize :Vector2i = DisplayServer.window_get_size()
 	var left: float = -(origin.x + windowSize.x/2.0)
 	var right: float = left + windowSize.x
 	var top: float = origin.y + (windowSize.y / 2.0)
 	var bottom: float = origin.y - (windowSize.y / 2.0)
+	var points : Array[Vector2] = []
 
 	while(left < right):
 		var x0: float = (left)/grid_spacing
@@ -194,7 +197,9 @@ func draw_function(input_function: Callable):
 		if y1 == INF: y1 = top
 		if y1 == -INF: y1 = bottom
 		draw_line(convert_to_godot_coords(Vector2(x0, y0)), convert_to_godot_coords(Vector2(x1, y1)), Color.RED, 2)
+		points.append(convert_to_godot_coords(Vector2(x0,y0)))
 		left += 1;
+	return points
 
 ## this function converts Godot coordinates to the equivilent in an xy plane.
 ## for example, the top left of the screen which is normally (0,0) will become (-x,y)
@@ -209,3 +214,20 @@ func convert_to_godot_coords(vec: Vector2):
 	var windowSize :Vector2 = DisplayServer.window_get_size()
 	var true_origin = Vector2(origin[0]+windowSize[0]/2, origin[1]+windowSize[1]/2)
 	return Vector2(vec[0]+true_origin[0], true_origin[1]-vec[1])
+	
+func animate_Limit(limit: float, points: Array[Vector2]):
+	var endpoint: float = convert_to_godot_coords(Vector2(limit,0)).x
+	var rect = ColorRect.new()
+	add_child(rect)
+	rect.position = Vector2(0,0)
+	rect.color = Color.YELLOW
+	rect.size = Vector2(10,10)
+	var speed = .01
+	if(endpoint < 0):
+		return
+	for i in range(0, points.size()):
+		print(points[i])
+		rect.position = points[i] - rect.size/2
+		await get_tree().create_timer(speed).timeout
+		speed *= 1.001
+		
