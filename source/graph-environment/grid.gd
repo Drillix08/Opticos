@@ -222,11 +222,17 @@ func animate_Limit(limit: float, points: Array[Vector2]):
 	rect.position = Vector2(0,0)
 	rect.color = Color.YELLOW
 	rect.size = Vector2(10,10)
+	var coordLabel: Label = Label.new()
+	coordLabel.add_theme_color_override("gray", Color.DIM_GRAY)
+	rect.add_child(coordLabel)
 	var speed = .01
 	if(endpoint < 0):
 		return
 	for i in range(0, points.size()):
-		print(points[i])
+		"""if(points[i].x < 0 || points[i].x > DisplayServer.window_get_size().x
+		\\ || points[i].x < 0 || points[i].x > DisplayServer.window_get_size().x): continue"""
+		var coords = convert_to_real_coords(points[i])
+		coordLabel.text = "(%.0f, " % coords.x + "%.3f" % coords.y + ")"
 		rect.position = points[i] - rect.size/2
 		await get_tree().create_timer(speed).timeout
 		speed *= 1.001
