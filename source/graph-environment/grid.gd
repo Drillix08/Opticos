@@ -6,6 +6,9 @@ extends Control
 var isDragging :bool = false
 var lastMousePos := Vector2.ZERO
 var origin := Vector2.ZERO
+signal do_something
+var pause: bool = false
+var frameOffset: int = 0
 
 '''
 If the x or y value of the origin has a distance
@@ -78,7 +81,7 @@ func _input(event):
 		lastMousePos = event.position
 		queue_redraw()
 	if event.is_action_pressed("ui_accept"):
-		animate_Limit(100, draw_function(func(x): return x*x))
+		animate_Limit(500, draw_function(func(x): return tan(x)))
 
 ## This function will draw the graph of the function specified by input_function
 ## The argument of this function should be a function that takes a single argument x and returns y
@@ -218,22 +221,47 @@ func convert_to_godot_coords(vec: Vector2):
 func animate_Limit(limit: float, points: Array[Vector2]):
 	var endpoint: float = convert_to_godot_coords(Vector2(limit,0)).x
 	var rect = ColorRect.new()
-	add_child(rect)
 	rect.position = Vector2(0,0)
 	rect.color = Color.YELLOW
 	rect.size = Vector2(10,10)
+	add_child(rect)
+	
 	var coordLabel: Label = Label.new()
 	coordLabel.add_theme_color_override("gray", Color.DIM_GRAY)
 	rect.add_child(coordLabel)
-	var speed = .01
+	$AnimationControls.visible = true
+	
+	var speed = .015
 	if(endpoint < 0):
 		return
-	for i in range(0, points.size()):
-		"""if(points[i].x < 0 || points[i].x > DisplayServer.window_get_size().x
-		\\ || points[i].x < 0 || points[i].x > DisplayServer.window_get_size().x): continue"""
-		var coords = convert_to_real_coords(points[i])
+	var i: int = 0
+	while (i < points.size()):
+		var coords: Vector2 = convert_to_real_coords(points[i])
+		if(pause):
+			await do_something
+			print(i)
+			i += frameOffset
+			print(frameOffset)
+			print(i)
+			frameOffset = 0
+		if(points[i].x < 0 || points[i].x > DisplayServer.window_get_size().x \
+		 || points[i].y < 0 || points[i].y > DisplayServer.window_get_size().y): continue
+		if(i + 1 != points.size() && points[i + 1].x > limit): break
+		#print(points[i])
 		coordLabel.text = "(%.0f, " % coords.x + "%.3f" % coords.y + ")"
 		rect.position = points[i] - rect.size/2
 		await get_tree().create_timer(speed).timeout
-		speed *= 1.001
-		
+		speed *= 1.002
+		i += 1
+
+func _on_play_pause_pressed() -> void:
+	pause = !pause
+	if(!pause): do_something.emit()
+
+
+func _on_next_pressed() -> void:
+	do_something.emit()
+
+func _on_back_pressed() -> void:
+	if(pause): frameOffset -= 1
+	do_something.emit()
