@@ -1,11 +1,17 @@
 extends Control
 
+@export var window_size :Vector2i = DisplayServer.window_get_size()
+var window_width :int = window_size.x
+var window_height :int = window_size.y 
+
 @export var grid_spacing :int = 100
 @export var gridline_thickness :float = 1.0
 
 var isDragging :bool = false
 var lastMousePos := Vector2.ZERO
 var origin := Vector2.ZERO
+
+var labelOffset = 0
 
 '''
 If the x or y value of the origin has a distance
@@ -28,10 +34,8 @@ func refresh_pixel_positions(xOffset, yOffset):
 	return [xOffset, yOffset]
 
 func _draw():
-	var windowSize :Vector2i = DisplayServer.window_get_size()
-	
 	#Draw the vertical lines of the grid
-	for x in range(0, 2*(int(windowSize.x)), grid_spacing):
+	for x in range(0, 2*(int(window_size.x)), grid_spacing):
 		var color = Color(0.5, 0.5, 0.5)
 		#offset values the pixel positions of the graph objects 
 		#have from their original positions when the origin was at initialization
@@ -39,11 +43,18 @@ func _draw():
 		var xOffset :float = refreshedPosition[0]
 		var yOffset :float = refreshedPosition[1]
 		#draw vertical gridline
-		draw_line(Vector2(x+xOffset, yOffset-grid_spacing), Vector2(x+xOffset, 2*windowSize.y+yOffset-grid_spacing), color, gridline_thickness)
+		draw_line(Vector2(x+xOffset, yOffset-grid_spacing), Vector2(x+xOffset, 2*window_size.y+yOffset-grid_spacing), color, gridline_thickness)
 		#draw an x-axis tick
-		draw_line(Vector2(x+xOffset, 280+origin.y), Vector2(x+xOffset, 320+origin.y), Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
+		var xTickPos = window_height/2
+		draw_line(Vector2(x+xOffset, xTickPos-grid_spacing/5+origin.y), Vector2(x+xOffset, xTickPos+grid_spacing/5+origin.y), Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
+		#draw the number label above the x-axis tick
+		var text_width = 25
+		var draw_position = Vector2(x+xOffset-text_width/3, xTickPos-grid_spacing/5+origin.y-grid_spacing/15)
+		var text_to_draw = str((x-window_width/2)/grid_spacing - int((origin.x-sign(origin.x))/grid_spacing))
+		var text_color = Color(0.541, 0.565, 0.541, 1.0) # White color
+		draw_string(ThemeDB.fallback_font, draw_position, text_to_draw, HORIZONTAL_ALIGNMENT_LEFT, 100, text_width, text_color)
 	#Draw the horizontal lines of the grid
-	for y in range(0, 2*(int(windowSize.y)), grid_spacing):
+	for y in range(0, 2*(int(window_size.y)), grid_spacing):
 		var color = Color(0.5, 0.5, 0.5)
 		#offset values the pixel positions of the graph objects 
 		#have from their original positions when the origin was at initialization
@@ -51,13 +62,21 @@ func _draw():
 		var xOffset :float = refreshedPosition[0]
 		var yOffset :float = refreshedPosition[1]
 		#Draw horizontal gridline
-		draw_line(Vector2(xOffset-grid_spacing, y+yOffset), Vector2(2*windowSize.x+xOffset-grid_spacing, y+yOffset), color, gridline_thickness)
+		draw_line(Vector2(xOffset-grid_spacing, y+yOffset), Vector2(2*window_size.x+xOffset-grid_spacing, y+yOffset), color, gridline_thickness)
 		#draw a y-axis tick
-		draw_line(Vector2(480+origin.x, y+yOffset), Vector2(520+origin.x, y+yOffset), Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
+		var yTickPos = window_width/2
+		draw_line(Vector2(yTickPos-grid_spacing/5+origin.x, y+yOffset), Vector2(yTickPos+grid_spacing/5+origin.x, y+yOffset), Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
+		#draw the number label above the y-axis tick
+		var text_width = 25
+		var draw_position = Vector2(yTickPos+grid_spacing/15+origin.x, y+yOffset-text_width/3)
+		var text_to_draw = str(-1*((y-window_height/2)/grid_spacing - int((origin.y-sign(origin.y))/grid_spacing)))
+		var text_color = Color(0.541, 0.565, 0.541, 1.0) # White color
+		draw_string(ThemeDB.fallback_font, draw_position, text_to_draw, HORIZONTAL_ALIGNMENT_LEFT, 100, text_width, text_color)
 	#Draw x-axis
-	draw_line(Vector2(-origin.x, 300) + origin, Vector2(1000-origin.x, 300) + origin, Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
+	draw_line(Vector2(-origin.x, window_height/2) + origin, Vector2(window_width-origin.x, window_height/2) + origin, Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
 	#draw y-axis
-	draw_line(Vector2(500, -origin.y) + origin, Vector2(500, 700-origin.y) + origin, Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
+	draw_line(Vector2(window_width/2, -origin.y) + origin, Vector2(window_width/2, window_height-origin.y) + origin, Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
+	queue_redraw()
 	
 #controlls the moving of the "camera" when you click and drag
 func _input(event):
