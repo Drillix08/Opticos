@@ -207,6 +207,7 @@ func draw_function(input_function: Callable):
 		else: draw_line(convert_to_godot_coords(Vector2(x0, y0)), convert_to_godot_coords(Vector2(x1, y1)), Color.RED, 2)
 		if(!animating): functionValues.append(convert_to_godot_coords(Vector2(x0,y0)))
 		left += 1;
+	return functionValues
 
 ## this function converts Godot coordinates to the equivilent in an xy plane.
 ## for example, the top left of the screen which is normally (0,0) will become (-x,y)
