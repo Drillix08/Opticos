@@ -74,11 +74,12 @@ func _draw():
 	
 #controlls the moving of the "camera" when you click and drag
 func _input(event):
+	if(animating): return
 	if event is InputEventMouseButton\
 	and event.button_index == MOUSE_BUTTON_LEFT:
 		isDragging = event.pressed
 		lastMousePos = event.position
-	if event is InputEventMouseMotion and isDragging and !animating:
+	if event is InputEventMouseMotion and isDragging:
 		var delta :Vector2 = event.position - lastMousePos
 		origin += delta
 		lastMousePos = event.position
@@ -203,7 +204,7 @@ func draw_function(input_function: Callable):
 		if y0 == -INF: y0 = bottom
 		if y1 == INF: y1 = top
 		if y1 == -INF: y1 = bottom
-		if animProg > x0: draw_line(convert_to_godot_coords(Vector2(x0, y0)), convert_to_godot_coords(Vector2(x1, y1)), Color.YELLOW, 2)
+		if animProg > x1: draw_line(convert_to_godot_coords(Vector2(x0, y0)), convert_to_godot_coords(Vector2(x1, y1)), Color.YELLOW, 2)
 		else: draw_line(convert_to_godot_coords(Vector2(x0, y0)), convert_to_godot_coords(Vector2(x1, y1)), Color.RED, 2)
 		if(!animating): functionValues.append(convert_to_godot_coords(Vector2(x0,y0)))
 		left += 1;
@@ -226,15 +227,15 @@ func convert_to_godot_coords(vec: Vector2):
 func animate_Limit(limit: float, points: Array[Vector2]):
 	animating = true
 	var endpoint: float = convert_to_godot_coords(Vector2(limit,0)).x
-	var rect = ColorRect.new()
+	var rect = TextureRect.new()
 	rect.position = Vector2(0,0)
-	rect.color = Color.YELLOW
-	rect.size = Vector2(10,10)
+	rect.texture = load("res://Yellow_Circle.png")
+	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	rect.size = Vector2(10, 10)
 	add_child(rect)
 	
-	var coordLabel: Label = Label.new()
-	coordLabel.add_theme_color_override("gray", Color.DIM_GRAY)
-	rect.add_child(coordLabel)
+	var coordLabel: CoordLabel = CoordLabel.new()
+	add_child(coordLabel)
 	$AnimationControls.visible = true
 	
 	var speed = .015
@@ -246,26 +247,29 @@ func animate_Limit(limit: float, points: Array[Vector2]):
 		animProg = coords.x
 		if(pause):
 			await do_something
-			print(i)
 			i += frameOffset
-			print(frameOffset)
-			print(i)
 			frameOffset = 0
-		if(points[i].x < 0 || points[i].x > DisplayServer.window_get_size().x \
-		 || points[i].y < 0 || points[i].y > DisplayServer.window_get_size().y): 
-			i += 1
-			continue
+			
+		#Skips off-screen stuff
+		#if(points[i].x < 0 || points[i].x > DisplayServer.window_get_size().x \
+		 #|| points[i].y < 0 || points[i].y > DisplayServer.window_get_size().y): 
+			#i += 1
+			#continue
+			
 		if(i + 1 != points.size() && points[i + 1].x > limit): break
 		#print(points[i])
 		coordLabel.text = "(%.0f, " % coords.x + "%.3f" % coords.y + ")"
 		rect.position = points[i] - rect.size/2
+		coordLabel.position = rect.position + rect.size/2
 		await get_tree().create_timer(speed).timeout
 		speed *= 1.002
 		i += 1
 		queue_redraw()
 	animProg = convert_to_real_coords(Vector2(-1,0)).x
 	animating = false
+	$AnimationControls.visible = true
 	rect.queue_free()
+	coordLabel.queue_free()
 
 func _on_play_pause_pressed() -> void:
 	pause = !pause

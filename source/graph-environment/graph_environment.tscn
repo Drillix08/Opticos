@@ -15,7 +15,6 @@ grow_vertical = 2
 script = ExtResource("1_17ijq")
 
 [node name="AnimationControls" type="Container" parent="Control"]
-visible = false
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 8.0
@@ -23,12 +22,15 @@ script = ExtResource("2_tlnqj")
 
 [node name="PlayPause" type="Button" parent="Control/AnimationControls"]
 layout_mode = 2
+text = "pause"
 
 [node name="Next" type="Button" parent="Control/AnimationControls"]
 layout_mode = 2
+text = ">"
 
 [node name="Back" type="Button" parent="Control/AnimationControls"]
 layout_mode = 2
+text = "<"
 
 [connection signal="pressed" from="Control/AnimationControls/PlayPause" to="Control" method="_on_play_pause_pressed"]
 [connection signal="pressed" from="Control/AnimationControls/Next" to="Control" method="_on_next_pressed"]
