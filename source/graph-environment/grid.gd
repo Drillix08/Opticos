@@ -234,8 +234,7 @@ func animate_Limit(limit: float, points: Array[Vector2]):
 	var coordLabel: Label = Label.new()
 	coordLabel.add_theme_color_override("gray", Color.DIM_GRAY)
 	rect.add_child(coordLabel)
-	print(1)
-	#$AnimationControls.visible = true
+	$AnimationControls.visible = true
 	
 	var speed = .015
 	if(endpoint < 0):
@@ -244,19 +243,19 @@ func animate_Limit(limit: float, points: Array[Vector2]):
 	while (i < points.size()):
 		var coords: Vector2 = convert_to_real_coords(points[i])
 		animProg = coords.x
-		#if(pause):
-			#await do_something
-			#print(i)
-			#i += frameOffset
-			#print(frameOffset)
-			#print(i)
-			#frameOffset = 0
+		if(pause):
+			await do_something
+			print(i)
+			i += frameOffset
+			print(frameOffset)
+			print(i)
+			frameOffset = 0
 		if(points[i].x < 0 || points[i].x > DisplayServer.window_get_size().x \
 		 || points[i].y < 0 || points[i].y > DisplayServer.window_get_size().y): 
 			i += 1
 			continue
 		if(i + 1 != points.size() && points[i + 1].x > limit): break
-		print(points[i])
+		#print(points[i])
 		coordLabel.text = "(%.0f, " % coords.x + "%.3f" % coords.y + ")"
 		rect.position = points[i] - rect.size/2
 		await get_tree().create_timer(speed).timeout
@@ -269,12 +268,16 @@ func animate_Limit(limit: float, points: Array[Vector2]):
 
 func _on_play_pause_pressed() -> void:
 	pause = !pause
-	if(!pause): do_something.emit()
+	if(!pause): 
+		do_something.emit()
+		$AnimationControls/PlayPause.text = "Pause"
+	else:
+		$AnimationControls/PlayPause.text = "Play"
 
 
 func _on_next_pressed() -> void:
 	do_something.emit()
 
 func _on_back_pressed() -> void:
-	if(pause): frameOffset -= 1
+	if(pause): frameOffset -= 2
 	do_something.emit()
