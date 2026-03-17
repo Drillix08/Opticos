@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://dlgeh0w3vomer"]
 
 [ext_resource type="Script" uid="uid://ctkau5kfofefi" path="res://grid.gd" id="1_17ijq"]
-[ext_resource type="Script" path="res://animation_controls.gd" id="2_tlnqj"]
+[ext_resource type="Script" uid="uid://b6e8i5j8f21wn" path="res://animation_controls.gd" id="2_tlnqj"]
 
 [node name="Node2D" type="Node2D"]
 

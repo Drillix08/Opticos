@@ -100,6 +100,7 @@ func _input(event):
 		var delta :Vector2 = event.position - lastMousePos
 		origin += delta
 		lastMousePos = event.position
+		animProg = convert_to_real_coords(Vector2(-1,0)).x
 		queue_redraw()
 	if event.is_action_pressed("zoom_in"):
 		print("scroll")
