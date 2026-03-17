@@ -15,6 +15,7 @@ grow_vertical = 2
 script = ExtResource("1_17ijq")
 
 [node name="AnimationControls" type="Container" parent="Control"]
+visible = false
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 8.0

@@ -86,7 +86,7 @@ func _input(event):
 		queue_redraw()
 	if event.is_action_pressed("ui_accept"):
 		animProg = convert_to_real_coords(Vector2(0,0)).x
-		animate_Limit(500, functionValues)
+		animate_Limit(500, functionValues, true, true)
 
 ## This function will draw the graph of the function specified by input_function
 ## The argument of this function should be a function that takes a single argument x and returns y
@@ -224,9 +224,20 @@ func convert_to_godot_coords(vec: Vector2):
 	var true_origin = Vector2(origin[0]+windowSize[0]/2, origin[1]+windowSize[1]/2)
 	return Vector2(vec[0]+true_origin[0], true_origin[1]-vec[1])
 	
-func animate_Limit(limit: float, points: Array[Vector2]):
+func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool):
 	animating = true
 	var endpoint: float = convert_to_godot_coords(Vector2(limit,0)).x
+	for coords in points:
+		if coords.x == limit:
+			print("hi")
+			var limit_point = TextureRect.new()
+			limit_point.texture = load("res://Black_Circle.png")
+			limit_point.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			limit_point.size = Vector2(20, 20)
+			limit_point.position = coords - Vector2(10, 10)
+			print(limit_point.position)
+			add_child(limit_point)
+			break
 	var rect = TextureRect.new()
 	rect.position = Vector2(0,0)
 	rect.texture = load("res://Yellow_Circle.png")
@@ -243,13 +254,12 @@ func animate_Limit(limit: float, points: Array[Vector2]):
 		return
 	var i: int = 0
 	while (i < points.size()):
-		var coords: Vector2 = convert_to_real_coords(points[i])
-		animProg = coords.x
 		if(pause):
 			await do_something
 			i += frameOffset
 			frameOffset = 0
-			
+		var coords: Vector2 = convert_to_real_coords(points[i])
+		animProg = coords.x
 		#Skips off-screen stuff
 		#if(points[i].x < 0 || points[i].x > DisplayServer.window_get_size().x \
 		 #|| points[i].y < 0 || points[i].y > DisplayServer.window_get_size().y): 
@@ -262,12 +272,12 @@ func animate_Limit(limit: float, points: Array[Vector2]):
 		rect.position = points[i] - rect.size/2
 		coordLabel.position = rect.position + rect.size/2
 		await get_tree().create_timer(speed).timeout
-		speed *= 1.002
+		#speed *= 1.002
 		i += 1
 		queue_redraw()
 	animProg = convert_to_real_coords(Vector2(-1,0)).x
 	animating = false
-	$AnimationControls.visible = true
+	$AnimationControls.visible = false
 	rect.queue_free()
 	coordLabel.queue_free()
 
