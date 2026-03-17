@@ -89,3 +89,6 @@ func _input(event):
 		origin += delta
 		lastMousePos = event.position
 		queue_redraw()
+		
+	if event.is_action_pressed("zoom_in"):
+		print("scroll")
