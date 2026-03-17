@@ -10,6 +10,12 @@ var window_height :int = window_size.y
 var isDragging :bool = false
 var lastMousePos := Vector2.ZERO
 var origin := Vector2.ZERO
+signal do_something
+var pause: bool = false
+var frameOffset: int = 0
+var functionValues: Array[Vector2] = [Vector2(-1, -1)]
+var animProg: float = convert_to_real_coords(Vector2(-1,0)).x
+var animating: bool = false
 
 var labelOffset = 0
 
@@ -73,13 +79,25 @@ func _draw():
 		var text_color = Color(0.541, 0.565, 0.541, 1.0) # White color
 		draw_string(ThemeDB.fallback_font, draw_position, text_to_draw, HORIZONTAL_ALIGNMENT_LEFT, 100, text_width, text_color)
 	#Draw x-axis
+<<<<<<< HEAD
 	draw_line(Vector2(-origin.x, window_height/2) + origin, Vector2(window_width-origin.x, window_height/2) + origin, Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
+=======
+	
+
+	draw_line(Vector2(-origin.x, 300) + origin, Vector2(1000-origin.x, 300) + origin, Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
+>>>>>>> 4c9f4e056d6af87337055f475eeb336e4d5ff54d
 	#draw y-axis
 	draw_line(Vector2(window_width/2, -origin.y) + origin, Vector2(window_width/2, window_height-origin.y) + origin, Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
 	queue_redraw()
 	
+	#Draw the function
+	draw_function(func(x):
+		return tan(x)
+	)
+	
 #controlls the moving of the "camera" when you click and drag
 func _input(event):
+	if(animating): return
 	if event is InputEventMouseButton\
 	and event.button_index == MOUSE_BUTTON_LEFT:
 		isDragging = event.pressed
@@ -89,3 +107,215 @@ func _input(event):
 		origin += delta
 		lastMousePos = event.position
 		queue_redraw()
+	if event.is_action_pressed("ui_accept"):
+		animProg = convert_to_real_coords(Vector2(0,0)).x
+		animate_Limit(500, functionValues, true, true)
+
+## This function will draw the graph of the function specified by input_function
+## The argument of this function should be a function that takes a single argument x and returns y
+func draw_function(input_function: Callable):
+	var windowSize :Vector2i = DisplayServer.window_get_size()
+	var left: float = -(origin.x + windowSize.x/2.0)
+	var right: float = left + windowSize.x
+	var top: float = origin.y + (windowSize.y / 2.0)
+	var bottom: float = origin.y - (windowSize.y / 2.0)
+	if(!animating): functionValues = [Vector2(-1, -1)]
+
+	while(left < right):
+		var x0: float = (left)/grid_spacing
+		var x1: float = (left+1)/grid_spacing
+		var y0: float = input_function.call(x0)
+		var y1: float = input_function.call(x1)
+
+		# figure out the starting point of functions with a left-asymptote
+		if is_nan(y0) && !is_nan(y1):
+			var initialX = x1;
+			var initialY = y1;
+			var step: float = 1.0 / grid_spacing
+			for i in range(16):
+				step /= 2
+				# try moving x0 forward
+				x0 += step;
+				y0 = input_function.call(x0)
+				y1 = input_function.call(x1)
+				if absf(y0) == INF || absf(y1) == INF: break
+				if !is_nan(y0):
+					# Went too far
+					x0 -= step
+					x1 -= step
+			y0 = input_function.call(x0)
+			y1 = input_function.call(x1)
+			if is_nan(y0) || absf(y0) > absf(y1): 
+				y0 = y1 * INF
+				y1 = initialY
+				x1 = initialX
+			elif is_nan(y1) || absf(y1) > absf(y0):
+				y1 = y0 * INF
+				y0 = initialY
+				x0 = initialX
+
+		# figure out the starting point of functions with a right-asymptote
+		elif !is_nan(y0) && is_nan(y1):
+			var initialX = x1;
+			var initialY = y1;
+			var step: float = 1.0 / grid_spacing
+			for i in range(16):
+				step /= 2
+				# try moving x1 backward
+				x1 -= step;
+				y0 = input_function.call(x0)
+				y1 = input_function.call(x1)
+				if absf(y0) == INF || absf(y1) == INF: break
+				if !is_nan(y1):
+					# Went too far
+					x0 += step
+					x1 += step
+
+			y0 = input_function.call(x0)
+			y1 = input_function.call(x1)
+			if is_nan(y0) || absf(y0) > absf(y1): 
+				y0 = y1 * INF
+				y1 = initialY
+				x1 = initialX
+			elif is_nan(y1) || absf(y1) > absf(y0):
+				y1 = y0 * INF
+				y0 = initialY
+				x0 = initialX
+
+		# figure out other types of asymptotes
+		elif absf(y0 - y1) > 200:
+			var max_jump: float = absf(y0 - y1)
+			
+			var step: float = 1.0 / grid_spacing
+			for i in range(16):
+				step /= 2
+				# try to move x0 forward
+				x0 += step
+				y0 = input_function.call(x0)
+				y1 = input_function.call(x1)
+				
+				if absf(y0 - y1) > max_jump:
+					max_jump = absf(y0 - y1)
+					continue # Worked! So move on
+				
+				# Went too far, try moving x1 back instead
+				x0 -= step
+				x1 -= step
+				y0 = input_function.call(x0)
+				y1 = input_function.call(x1)
+				if absf(y0 - y1) > max_jump:
+					max_jump = absf(y0 - y1)
+					continue # Worked! So move on
+					
+				# Still too far, reset back to initial to try again
+				# With a smaller step size
+				x1 += step
+
+			# If we narrowed the jump down to a small enough step size,
+			# while still maintaing the size of the jump,
+			# then it's likely an asymptote
+			if x1 - x0 < 0.0001:
+				left += 1
+				continue
+		
+		# Actually drawing the line with the correct spacing:
+		x0 *= grid_spacing
+		x1 *= grid_spacing
+		y0 *= grid_spacing
+		y1 *= grid_spacing
+		if y0 == INF: y0 = top
+		if y0 == -INF: y0 = bottom
+		if y1 == INF: y1 = top
+		if y1 == -INF: y1 = bottom
+		if animProg > x1: draw_line(convert_to_godot_coords(Vector2(x0, y0)), convert_to_godot_coords(Vector2(x1, y1)), Color.YELLOW, 2)
+		else: draw_line(convert_to_godot_coords(Vector2(x0, y0)), convert_to_godot_coords(Vector2(x1, y1)), Color.RED, 2)
+		if(!animating): functionValues.append(convert_to_godot_coords(Vector2(x0,y0)))
+		left += 1;
+	return functionValues
+
+## this function converts Godot coordinates to the equivilent in an xy plane.
+## for example, the top left of the screen which is normally (0,0) will become (-x,y)
+func convert_to_real_coords(vec: Vector2):
+	var windowSize :Vector2 = DisplayServer.window_get_size()
+	var true_origin = Vector2(origin[0]+windowSize[0]/2, origin[1]+windowSize[1]/2)
+	return Vector2(vec[0]-true_origin[0], true_origin[1]-vec[1])
+	
+## this function converts xy coordinates to their equivalent in Godot.
+## for example, the origin which is normally (0, 0) would become (screenwidth/2, screenheight/2)
+func convert_to_godot_coords(vec: Vector2):
+	var windowSize :Vector2 = DisplayServer.window_get_size()
+	var true_origin = Vector2(origin[0]+windowSize[0]/2, origin[1]+windowSize[1]/2)
+	return Vector2(vec[0]+true_origin[0], true_origin[1]-vec[1])
+	
+func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool):
+	animating = true
+	var endpoint: float = convert_to_godot_coords(Vector2(limit,0)).x
+	for coords in points:
+		if coords.x == limit:
+			print("hi")
+			var limit_point = TextureRect.new()
+			limit_point.texture = load("res://Black_Circle.png")
+			limit_point.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			limit_point.size = Vector2(20, 20)
+			limit_point.position = coords - Vector2(10, 10)
+			print(limit_point.position)
+			add_child(limit_point)
+			break
+	var rect = TextureRect.new()
+	rect.position = Vector2(0,0)
+	rect.texture = load("res://Yellow_Circle.png")
+	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	rect.size = Vector2(10, 10)
+	add_child(rect)
+	
+	var coordLabel: CoordLabel = CoordLabel.new()
+	add_child(coordLabel)
+	$AnimationControls.visible = true
+	
+	var speed = .015
+	if(endpoint < 0):
+		return
+	var i: int = 0
+	while (i < points.size()):
+		if(pause):
+			await do_something
+			i += frameOffset
+			frameOffset = 0
+		var coords: Vector2 = convert_to_real_coords(points[i])
+		animProg = coords.x
+		#Skips off-screen stuff
+		#if(points[i].x < 0 || points[i].x > DisplayServer.window_get_size().x \
+		 #|| points[i].y < 0 || points[i].y > DisplayServer.window_get_size().y): 
+			#i += 1
+			#continue
+			
+		if(i + 1 != points.size() && points[i + 1].x > limit): break
+		#print(points[i])
+		coordLabel.text = "(%.0f, " % coords.x + "%.3f" % coords.y + ")"
+		rect.position = points[i] - rect.size/2
+		coordLabel.position = rect.position + rect.size/2
+		await get_tree().create_timer(speed).timeout
+		#speed *= 1.002
+		i += 1
+		queue_redraw()
+	animProg = convert_to_real_coords(Vector2(-1,0)).x
+	animating = false
+	$AnimationControls.visible = false
+	rect.queue_free()
+	coordLabel.queue_free()
+
+func _on_play_pause_pressed() -> void:
+	pause = !pause
+	if(!pause): 
+		do_something.emit()
+		$AnimationControls/PlayPause.text = "Pause"
+	else:
+		$AnimationControls/PlayPause.text = "Play"
+
+
+func _on_next_pressed() -> void:
+	do_something.emit()
+
+func _on_back_pressed() -> void:
+	if(pause): frameOffset -= 2
+	do_something.emit()

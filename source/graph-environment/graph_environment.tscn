@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://dlgeh0w3vomer"]
+[gd_scene load_steps=3 format=3 uid="uid://dlgeh0w3vomer"]
 
 [ext_resource type="Script" uid="uid://ctkau5kfofefi" path="res://grid.gd" id="1_17ijq"]
+[ext_resource type="Script" uid="uid://b6e8i5j8f21wn" path="res://animation_controls.gd" id="2_tlnqj"]
 
 [node name="Node2D" type="Node2D"]
 
@@ -12,3 +13,26 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_17ijq")
+
+[node name="AnimationControls" type="Container" parent="Control"]
+visible = false
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 8.0
+script = ExtResource("2_tlnqj")
+
+[node name="PlayPause" type="Button" parent="Control/AnimationControls"]
+layout_mode = 2
+text = "pause"
+
+[node name="Next" type="Button" parent="Control/AnimationControls"]
+layout_mode = 2
+text = ">"
+
+[node name="Back" type="Button" parent="Control/AnimationControls"]
+layout_mode = 2
+text = "<"
+
+[connection signal="pressed" from="Control/AnimationControls/PlayPause" to="Control" method="_on_play_pause_pressed"]
+[connection signal="pressed" from="Control/AnimationControls/Next" to="Control" method="_on_next_pressed"]
+[connection signal="pressed" from="Control/AnimationControls/Back" to="Control" method="_on_back_pressed"]
