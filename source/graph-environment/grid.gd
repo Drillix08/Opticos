@@ -17,6 +17,9 @@ var functionValues: Array[Vector2] = [Vector2(-1, -1)]
 var animProg: float = convert_to_real_coords(Vector2(-1,0)).x
 var animating: bool = false
 
+var secant_line_left: Vector2 = Vector2(0, 0)
+var secant_line_right: Vector2 = Vector2(0, 0)
+
 var labelOffset = 0
 
 '''
@@ -82,12 +85,18 @@ func _draw():
 	draw_line(Vector2(-origin.x, window_height/2) + origin, Vector2(window_width-origin.x, window_height/2) + origin, Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
 	#draw y-axis
 	draw_line(Vector2(window_width/2, -origin.y) + origin, Vector2(window_width/2, window_height-origin.y) + origin, Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
+	
+	#draw_line(Vector2(0.0, 385.0076), Vector2(1000.0, 646.5566), Color.YELLOW)
+
 	queue_redraw()
 	
 	#Draw the function
 	draw_function(func(x):
 		return tan(x)
 	)
+	
+	draw_line(secant_line_left, secant_line_right, Color.YELLOW)
+
 	
 #controlls the moving of the "camera" when you click and drag
 func _input(event):
@@ -106,7 +115,8 @@ func _input(event):
 		print("scroll")
 	if event.is_action_pressed("ui_accept"):
 		animProg = convert_to_real_coords(Vector2(0,0)).x
-		animate_Limit(500, functionValues, true, true)
+		#animate_Limit(500, functionValues, true, true)
+		animate_derivative(0)
 
 ## This function will draw the graph of the function specified by input_function
 ## The argument of this function should be a function that takes a single argument x and returns y
@@ -300,6 +310,54 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 	$AnimationControls.visible = false
 	rect.queue_free()
 	coordLabel.queue_free()
+	
+# using limit definition of derivative
+# f'(x) = lim_{h->0} ( f(x+h) - f(x) ) / h
+func animate_derivative(x: float):
+	print("animating derivative")
+	animating = true
+	$AnimationControls.visible = true
+
+	x = floorf(x*grid_spacing) 
+	var target: Vector2
+	# finding point representing x in functionValues
+	for point in functionValues:
+		if convert_to_real_coords(point)[0] == x:
+			target = convert_to_real_coords(point)/grid_spacing
+			break
+	var speed = .0015
+	var i: int = len(functionValues)-1
+	while convert_to_real_coords(functionValues[i])[0] > int(x):
+		print(convert_to_real_coords(functionValues[i])[0], " ", int(x))
+		if(pause):
+			await do_something
+			i += frameOffset
+			frameOffset = 0
+		var pos: Vector2 = convert_to_real_coords(functionValues[i])/grid_spacing # the point representing h
+		# calculate the secant line
+		# y = mx + b
+		var m: float = ( pos[1] - target[1] ) / ( pos[0] - target[0] )
+		print(target, " ", pos)
+		var b: float = target[1] - m*target[0]
+		print(m, "x + ", b)
+		var left: float = -(origin.x + window_width/2.0)
+		var right: float = left + window_width
+		var x0: float = (left)/grid_spacing
+		var x1: float = (right)/grid_spacing
+		var y0: float = m*x0+b
+		var y1: float = m*x1+b
+		x0 *= grid_spacing
+		x1 *= grid_spacing
+		y0 *= grid_spacing
+		y1 *= grid_spacing
+		
+		print("drawing line", convert_to_godot_coords(Vector2(x0, y0)), convert_to_godot_coords(Vector2(x1, y1)))
+		secant_line_left = convert_to_godot_coords(Vector2(x0, y0))
+		secant_line_right = convert_to_godot_coords(Vector2(x1, y1))
+		queue_redraw()
+		await get_tree().create_timer(speed).timeout
+		i -= 1
+	pass
 
 func _on_play_pause_pressed() -> void:
 	pause = !pause
