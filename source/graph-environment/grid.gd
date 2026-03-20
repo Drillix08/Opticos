@@ -14,7 +14,8 @@ signal do_something
 var pause: bool = false
 var frameOffset: int = 0
 var functionValues: Array[Vector2] = [Vector2(-1, -1)]
-var animProg: float = convert_to_real_coords(Vector2(-1,0)).x
+var animProgLeft: float = convert_to_real_coords(Vector2(-1,0)).x
+var animProgRight: float = convert_to_real_coords(Vector2(200000,0)).x
 var animating: bool = false
 
 var labelOffset = 0
@@ -58,7 +59,7 @@ func _draw():
 		var draw_position = Vector2(x+xOffset-text_width/3, xTickPos-grid_spacing/5+origin.y-grid_spacing/15)
 		var text_to_draw = str((x-window_width/2)/grid_spacing - int((origin.x-sign(origin.x))/grid_spacing))
 		var text_color = Color(0.541, 0.565, 0.541, 1.0) # White color
-		draw_string(ThemeDB.fallback_font, draw_position, text_to_draw, HORIZONTAL_ALIGNMENT_LEFT, 100, text_width, text_color)
+		if(text_to_draw != "0"): draw_string(ThemeDB.fallback_font, draw_position, text_to_draw, HORIZONTAL_ALIGNMENT_LEFT, 100, text_width, text_color)
 	#Draw the horizontal lines of the grid
 	for y in range(0, 2*(int(window_size.y)), grid_spacing):
 		var color = Color(0.5, 0.5, 0.5)
@@ -100,13 +101,13 @@ func _input(event):
 		var delta :Vector2 = event.position - lastMousePos
 		origin += delta
 		lastMousePos = event.position
-		animProg = convert_to_real_coords(Vector2(-1,0)).x
+		animProgLeft = convert_to_real_coords(Vector2(-1,0)).x
 		queue_redraw()
 	if event.is_action_pressed("zoom_in"):
 		print("scroll")
 	if event.is_action_pressed("ui_accept"):
-		animProg = convert_to_real_coords(Vector2(0,0)).x
-		animate_Limit(500, functionValues, true, true)
+		animProgLeft = convert_to_real_coords(Vector2(0,0)).x
+		animate_Limit(500, functionValues, true, true, .015, 1.002)
 
 ## This function will draw the graph of the function specified by input_function
 ## The argument of this function should be a function that takes a single argument x and returns y
@@ -224,7 +225,8 @@ func draw_function(input_function: Callable):
 		if y0 == -INF: y0 = bottom
 		if y1 == INF: y1 = top
 		if y1 == -INF: y1 = bottom
-		if animProg > x1: draw_line(convert_to_godot_coords(Vector2(x0, y0)), convert_to_godot_coords(Vector2(x1, y1)), Color.YELLOW, 2)
+		if (animating && animProgLeft > x1): draw_line(convert_to_godot_coords(Vector2(x0, y0)), convert_to_godot_coords(Vector2(x1, y1)), Color.YELLOW, 2)
+		elif(animating && animProgRight < x0): draw_line(convert_to_godot_coords(Vector2(x0, y0)), convert_to_godot_coords(Vector2(x1, y1)), Color.YELLOW, 2)
 		else: draw_line(convert_to_godot_coords(Vector2(x0, y0)), convert_to_godot_coords(Vector2(x1, y1)), Color.RED, 2)
 		if(!animating): functionValues.append(convert_to_godot_coords(Vector2(x0,y0)))
 		left += 1;
@@ -243,33 +245,50 @@ func convert_to_godot_coords(vec: Vector2):
 	var windowSize :Vector2 = DisplayServer.window_get_size()
 	var true_origin = Vector2(origin[0]+windowSize[0]/2, origin[1]+windowSize[1]/2)
 	return Vector2(vec[0]+true_origin[0], true_origin[1]-vec[1])
-	
-func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool):
+
+## Function for animating values approaching a limit from left and/or right position
+## initially at [code]speed[/code] seconds per point slowing at a rate of [code]rate[/code] per point
+func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool, speed: float, rate: float):
+	if(!(right || left)): return 
 	animating = true
 	var endpoint: float = convert_to_godot_coords(Vector2(limit,0)).x
+	var limit_point: TextureRect = null
 	for coords in points:
 		if coords.x == limit:
-			print("hi")
-			var limit_point = TextureRect.new()
+			limit_point = TextureRect.new()
 			limit_point.texture = load("res://Black_Circle.png")
 			limit_point.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			limit_point.size = Vector2(20, 20)
 			limit_point.position = coords - Vector2(10, 10)
-			print(limit_point.position)
 			add_child(limit_point)
 			break
-	var rect = TextureRect.new()
-	rect.position = Vector2(0,0)
-	rect.texture = load("res://Yellow_Circle.png")
-	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	rect.size = Vector2(10, 10)
-	add_child(rect)
+	var rect: TextureRect = null
+	var rect2: TextureRect = null
+	if(left): 
+		rect = TextureRect.new()
+		rect.position = Vector2(0,0)
+		rect.texture = load("res://Yellow_Circle.png")
+		rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		rect.size = Vector2(10, 10)
+		add_child(rect)
+	if(right):
+		rect2 = TextureRect.new()
+		rect2.position = Vector2(0,0)
+		rect2.texture = load("res://Yellow_Circle.png")
+		rect2.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		rect2.size = Vector2(10, 10)
+		add_child(rect2)
 	
-	var coordLabel: CoordLabel = CoordLabel.new()
-	add_child(coordLabel)
+	var coordLabel: CoordLabel = null
+	var coordLabel2: CoordLabel = null
+	if(left):
+		coordLabel = CoordLabel.new()
+		add_child(coordLabel)
+	if(right):
+		coordLabel2 = CoordLabel.new()
+		add_child(coordLabel2)
 	$AnimationControls.visible = true
 	
-	var speed = .015
 	if(endpoint < 0):
 		return
 	var i: int = 0
@@ -279,27 +298,36 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 			i += frameOffset
 			frameOffset = 0
 		var coords: Vector2 = convert_to_real_coords(points[i])
-		animProg = coords.x
-		#Skips off-screen stuff
-		#if(points[i].x < 0 || points[i].x > DisplayServer.window_get_size().x \
-		 #|| points[i].y < 0 || points[i].y > DisplayServer.window_get_size().y): 
-			#i += 1
-			#continue
-			
+		var coords2: Vector2 = convert_to_real_coords(points[points.size() - i - 1])
+		if(left): animProgLeft = coords.x
+		if(right): animProgRight = coords2.x
 		if(i + 1 != points.size() && points[i + 1].x > limit): break
 		#print(points[i])
-		coordLabel.text = "(%.0f, " % coords.x + "%.3f" % coords.y + ")"
-		rect.position = points[i] - rect.size/2
-		coordLabel.position = rect.position + rect.size/2
+		if(left): 
+			coordLabel.text = "(%.0f, " % coords.x + "%.3f" % coords.y + ")"
+			rect.position = points[i] - rect.size/2
+			coordLabel.position = rect.position + rect.size/2
+			coordLabel.check_coords()
+		if(right): 
+			coordLabel2.text = "(%.0f, " % coords2.x + "%.3f" % coords2.y + ")"
+			rect2.position = points[points.size() - i - 1] - rect2.size/2
+			coordLabel2.position = rect2.position + rect2.size/2
+			coordLabel2.check_coords()
 		await get_tree().create_timer(speed).timeout
-		#speed *= 1.002
+		speed *= rate
 		i += 1
 		queue_redraw()
-	animProg = convert_to_real_coords(Vector2(-1,0)).x
+	animProgLeft = convert_to_real_coords(Vector2(-1,0)).x
+	animProgRight = convert_to_real_coords(Vector2(200000,0)).x
 	animating = false
 	$AnimationControls.visible = false
-	rect.queue_free()
-	coordLabel.queue_free()
+	if(left): 
+		rect.queue_free()
+		coordLabel.queue_free()
+	if(right):
+		rect2.queue_free()
+		coordLabel2.queue_free()
+	limit_point.queue_free()
 
 func _on_play_pause_pressed() -> void:
 	pause = !pause

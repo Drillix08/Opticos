@@ -8,6 +8,9 @@ func _ready() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
+	pass
+
+func check_coords() -> void:
 	if (position.x < 0):
 		position.x = 0
 	if (position.y < 0):
@@ -16,3 +19,4 @@ func _process(_delta: float) -> void:
 		position.y = DisplayServer.window_get_size().y - size.y
 	if (position.x + size.x > DisplayServer.window_get_size().x):
 		position.x = DisplayServer.window_get_size().x - size.x
+	
