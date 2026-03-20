@@ -92,7 +92,7 @@ func _draw():
 	
 	#Draw the function
 	draw_function(func(x):
-		return tan(x)
+		return cos(x)
 	)
 	
 	draw_line(secant_line_left, secant_line_right, Color.YELLOW)
@@ -115,7 +115,8 @@ func _input(event):
 		print("scroll")
 	if event.is_action_pressed("ui_accept"):
 		animProg = convert_to_real_coords(Vector2(0,0)).x
-		#animate_Limit(500, functionValues, true, true)
+		animate_Limit(500, functionValues, true, true)
+	if Input.is_key_pressed(KEY_D):
 		animate_derivative(0)
 
 ## This function will draw the graph of the function specified by input_function
@@ -314,21 +315,53 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 # using limit definition of derivative
 # f'(x) = lim_{h->0} ( f(x+h) - f(x) ) / h
 func animate_derivative(x: float):
-	print("animating derivative")
 	animating = true
 	$AnimationControls.visible = true
-
+	
+	# display box for equation of line
+	var line_slope: CoordLabel = CoordLabel.new()
+	line_slope.position = Vector2(10, 50)
+	add_child(line_slope)
+	
 	x = floorf(x*grid_spacing) 
 	var target: Vector2
+	var target_point = TextureRect.new()
 	# finding point representing x in functionValues
+	var found = false
 	for point in functionValues:
 		if convert_to_real_coords(point)[0] == x:
 			target = convert_to_real_coords(point)/grid_spacing
+			#drawing a point at the target derivative location
+			target_point.texture = load("res://Black_Circle.png")
+			target_point.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			target_point.size = Vector2(20, 20)
+			target_point.position = point - Vector2(10, 10)
+			add_child(target_point)
+			found = true
 			break
+	if !found:
+		print("Target x coordinate not on screen")
+		$AnimationControls.visible = false
+		animating = false
+		line_slope.free()
+		target_point.free()
+		return
+	
 	var speed = .0015
 	var i: int = len(functionValues)-1
+	
+	var rect = TextureRect.new()
+	rect.texture = load("res://Yellow_Circle.png")
+	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	rect.size = Vector2(10, 10)
+	add_child(rect)		
+	var coordLabel: CoordLabel = CoordLabel.new()
+	add_child(coordLabel)
 	while convert_to_real_coords(functionValues[i])[0] > int(x):
-		print(convert_to_real_coords(functionValues[i])[0], " ", int(x))
+		# update position of the current position adjusted for offset
+		coordLabel.text = "(%.0f, " % convert_to_real_coords(functionValues[i])[0] + "%.3f" % convert_to_real_coords(functionValues[i])[1] + ")"
+		rect.position = functionValues[i] - rect.size/2
+		coordLabel.position = rect.position + rect.size/2
 		if(pause):
 			await do_something
 			i += frameOffset
@@ -337,9 +370,8 @@ func animate_derivative(x: float):
 		# calculate the secant line
 		# y = mx + b
 		var m: float = ( pos[1] - target[1] ) / ( pos[0] - target[0] )
-		print(target, " ", pos)
 		var b: float = target[1] - m*target[0]
-		print(m, "x + ", b)
+		line_slope.text = "Slope: %.3f" % m
 		var left: float = -(origin.x + window_width/2.0)
 		var right: float = left + window_width
 		var x0: float = (left)/grid_spacing
@@ -351,13 +383,27 @@ func animate_derivative(x: float):
 		y0 *= grid_spacing
 		y1 *= grid_spacing
 		
-		print("drawing line", convert_to_godot_coords(Vector2(x0, y0)), convert_to_godot_coords(Vector2(x1, y1)))
 		secant_line_left = convert_to_godot_coords(Vector2(x0, y0))
 		secant_line_right = convert_to_godot_coords(Vector2(x1, y1))
 		queue_redraw()
 		await get_tree().create_timer(speed).timeout
 		i -= 1
-	pass
+	#perform one more update after the fact
+	coordLabel.text = "(%.0f, " % convert_to_real_coords(functionValues[i])[0] + "%.3f" % convert_to_real_coords(functionValues[i])[1] + ")"
+	rect.position = functionValues[i] - rect.size/2
+	coordLabel.position = rect.position + rect.size/2
+	
+	$AnimationControls.visible = false
+	animating = false
+	
+	# freeing components added to the script
+	rect.free()
+	line_slope.free()
+	coordLabel.free()
+	target_point.free()
+	secant_line_left = Vector2.ZERO
+	secant_line_right = Vector2.ZERO
+	queue_redraw()
 
 func _on_play_pause_pressed() -> void:
 	pause = !pause
