@@ -118,7 +118,7 @@ func _input(event):
 		animProgLeft = convert_to_real_coords(Vector2(0,0)).x
 		animate_Limit(500, functionValues, true, true, .015, 1.002)
 	if Input.is_key_pressed(KEY_D):
-		animate_derivative(0)
+		animate_derivative(1)
 
 ## This function will draw the graph of the function specified by input_function
 ## The argument of this function should be a function that takes a single argument x and returns y
@@ -360,9 +360,9 @@ func animate_derivative(x: float):
 		if convert_to_real_coords(point)[0] == x:
 			target = convert_to_real_coords(point)/grid_spacing
 			#drawing a point at the target derivative location
-			target_point.texture = load("res://Black_Circle.png")
+			target_point.texture = load("res://Solid_Black_Circle.png")
 			target_point.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			target_point.size = Vector2(20, 20)
+			target_point.size = Vector2(10, 10)
 			target_point.position = point - Vector2(10, 10)
 			add_child(target_point)
 			found = true
