@@ -18,6 +18,9 @@ var animProgLeft: float = convert_to_real_coords(Vector2(-1,0)).x
 var animProgRight: float = convert_to_real_coords(Vector2(200000,0)).x
 var animating: bool = false
 
+var secant_line_left: Vector2 = Vector2(0, 0)
+var secant_line_right: Vector2 = Vector2(0, 0)
+
 var labelOffset = 0
 
 '''
@@ -83,12 +86,18 @@ func _draw():
 	draw_line(Vector2(-origin.x, window_height/2) + origin, Vector2(window_width-origin.x, window_height/2) + origin, Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
 	#draw y-axis
 	draw_line(Vector2(window_width/2, -origin.y) + origin, Vector2(window_width/2, window_height-origin.y) + origin, Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
+	
+	#draw_line(Vector2(0.0, 385.0076), Vector2(1000.0, 646.5566), Color.YELLOW)
+
 	queue_redraw()
 	
 	#Draw the function
 	draw_function(func(x):
-		return tan(x)
+		return cos(x)
 	)
+	
+	draw_line(secant_line_left, secant_line_right, Color.YELLOW)
+
 	
 #controlls the moving of the "camera" when you click and drag
 func _input(event):
@@ -108,6 +117,8 @@ func _input(event):
 	if event.is_action_pressed("ui_accept"):
 		animProgLeft = convert_to_real_coords(Vector2(0,0)).x
 		animate_Limit(500, functionValues, true, true, .015, 1.002)
+	if Input.is_key_pressed(KEY_D):
+		animate_derivative(0)
 
 ## This function will draw the graph of the function specified by input_function
 ## The argument of this function should be a function that takes a single argument x and returns y
@@ -328,6 +339,99 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 		rect2.queue_free()
 		coordLabel2.queue_free()
 	limit_point.queue_free()
+	
+# using limit definition of derivative
+# f'(x) = lim_{h->0} ( f(x+h) - f(x) ) / h
+func animate_derivative(x: float):
+	animating = true
+	$AnimationControls.visible = true
+	
+	# display box for equation of line
+	var line_slope: CoordLabel = CoordLabel.new()
+	line_slope.position = Vector2(10, 50)
+	add_child(line_slope)
+	
+	x = floorf(x*grid_spacing) 
+	var target: Vector2
+	var target_point = TextureRect.new()
+	# finding point representing x in functionValues
+	var found = false
+	for point in functionValues:
+		if convert_to_real_coords(point)[0] == x:
+			target = convert_to_real_coords(point)/grid_spacing
+			#drawing a point at the target derivative location
+			target_point.texture = load("res://Black_Circle.png")
+			target_point.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			target_point.size = Vector2(20, 20)
+			target_point.position = point - Vector2(10, 10)
+			add_child(target_point)
+			found = true
+			break
+	if !found:
+		print("Target x coordinate not on screen")
+		$AnimationControls.visible = false
+		animating = false
+		line_slope.free()
+		target_point.free()
+		return
+	
+	var speed = .0015
+	var i: int = len(functionValues)-1
+	
+	var rect = TextureRect.new()
+	rect.texture = load("res://Yellow_Circle.png")
+	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	rect.size = Vector2(10, 10)
+	add_child(rect)		
+	var coordLabel: CoordLabel = CoordLabel.new()
+	add_child(coordLabel)
+	while convert_to_real_coords(functionValues[i])[0] > int(x):
+		# update position of the current position adjusted for offset
+		coordLabel.text = "(%.0f, " % convert_to_real_coords(functionValues[i])[0] + "%.3f" % convert_to_real_coords(functionValues[i])[1] + ")"
+		rect.position = functionValues[i] - rect.size/2
+		coordLabel.position = rect.position + rect.size/2
+		if(pause):
+			await do_something
+			i += frameOffset
+			frameOffset = 0
+		var pos: Vector2 = convert_to_real_coords(functionValues[i])/grid_spacing # the point representing h
+		# calculate the secant line
+		# y = mx + b
+		var m: float = ( pos[1] - target[1] ) / ( pos[0] - target[0] )
+		var b: float = target[1] - m*target[0]
+		line_slope.text = "Slope: %.3f" % m
+		var left: float = -(origin.x + window_width/2.0)
+		var right: float = left + window_width
+		var x0: float = (left)/grid_spacing
+		var x1: float = (right)/grid_spacing
+		var y0: float = m*x0+b
+		var y1: float = m*x1+b
+		x0 *= grid_spacing
+		x1 *= grid_spacing
+		y0 *= grid_spacing
+		y1 *= grid_spacing
+		
+		secant_line_left = convert_to_godot_coords(Vector2(x0, y0))
+		secant_line_right = convert_to_godot_coords(Vector2(x1, y1))
+		queue_redraw()
+		await get_tree().create_timer(speed).timeout
+		i -= 1
+	#perform one more update after the fact
+	coordLabel.text = "(%.0f, " % convert_to_real_coords(functionValues[i])[0] + "%.3f" % convert_to_real_coords(functionValues[i])[1] + ")"
+	rect.position = functionValues[i] - rect.size/2
+	coordLabel.position = rect.position + rect.size/2
+	
+	$AnimationControls.visible = false
+	animating = false
+	
+	# freeing components added to the script
+	rect.free()
+	line_slope.free()
+	coordLabel.free()
+	target_point.free()
+	secant_line_left = Vector2.ZERO
+	secant_line_right = Vector2.ZERO
+	queue_redraw()
 
 func _on_play_pause_pressed() -> void:
 	pause = !pause
