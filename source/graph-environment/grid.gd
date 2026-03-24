@@ -21,6 +21,8 @@ var animating: bool = false
 var secant_line_left: Vector2 = Vector2(0, 0)
 var secant_line_right: Vector2 = Vector2(0, 0)
 
+var rectangles: Array[Rect2]
+
 var labelOffset = 0
 
 '''
@@ -93,10 +95,11 @@ func _draw():
 	
 	#Draw the function
 	draw_function(func(x):
-		return cos(x)
+		return tan(x)
 	)
 	
 	draw_line(secant_line_left, secant_line_right, Color.YELLOW)
+	for rectangle in rectangles: draw_rect(rectangle, Color.YELLOW)
 
 	
 #controlls the moving of the "camera" when you click and drag
@@ -119,6 +122,8 @@ func _input(event):
 		animate_Limit(500, functionValues, true, true, .015, 1.002)
 	if Input.is_key_pressed(KEY_D):
 		animate_derivative(1)
+	if Input.is_key_pressed(KEY_I):
+		animate_Integral()
 
 ## This function will draw the graph of the function specified by input_function
 ## The argument of this function should be a function that takes a single argument x and returns y
@@ -432,6 +437,38 @@ func animate_derivative(x: float):
 	secant_line_left = Vector2.ZERO
 	secant_line_right = Vector2.ZERO
 	queue_redraw()
+	
+func animate_Integral():
+	animating = true
+	$AnimationControls.visible = true
+	
+	#var speed = .0015
+	var speed = 1
+	var maxRectangleCount: int = len(functionValues)-1
+	var currentRectangleCount: int = 2
+	while currentRectangleCount <= maxRectangleCount:
+		if(pause):
+			await do_something
+			frameOffset = 0
+		@warning_ignore("integer_division")
+		var increment = maxRectangleCount/currentRectangleCount
+		
+		# left side Riemann sum
+		for i in range(1, maxRectangleCount-increment+1, increment-1):
+			var rect_position: Vector2 = functionValues[i]
+			var width: float = increment
+			var height: float = convert_to_real_coords(rect_position)[1]
+			# if the height
+			var rect_size: Vector2 = Vector2(width, height)
+			rectangles.append(Rect2(rect_position, rect_size))
+		queue_redraw()	
+		await get_tree().create_timer(speed).timeout
+		rectangles.clear()
+		currentRectangleCount *= 2
+	
+	animating = false
+	$AnimationControls.visible = false
+	
 
 func _on_play_pause_pressed() -> void:
 	pause = !pause
