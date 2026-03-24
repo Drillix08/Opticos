@@ -368,7 +368,7 @@ func animate_derivative(x: float):
 			target_point.texture = load("res://Solid_Black_Circle.png")
 			target_point.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			target_point.size = Vector2(10, 10)
-			target_point.position = point - Vector2(10, 10)
+			target_point.position = point - Vector2(5, 5)
 			add_child(target_point)
 			found = true
 			break
