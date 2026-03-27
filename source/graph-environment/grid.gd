@@ -119,7 +119,7 @@ func _input(event):
 		print("scroll")
 	if event.is_action_pressed("ui_accept"):
 		animProgLeft = convert_to_real_coords(Vector2(0,0)).x
-		animate_Limit(500, functionValues, true, true, .015, 1.002)
+		animate_Limit(200, functionValues, true, true, .015, 1.001)
 	if Input.is_key_pressed(KEY_D):
 		animate_derivative(1)
 	if Input.is_key_pressed(KEY_I):
@@ -304,34 +304,40 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 		coordLabel2 = CoordLabel.new()
 		add_child(coordLabel2)
 	$AnimationControls.visible = true
-	
 	if(endpoint < 0):
 		return
-	var i: int = 0
+	var i: int = 1
+	var j: int = 0
 	while (i < points.size()):
 		if(pause):
 			await do_something
 			i += frameOffset
 			frameOffset = 0
-		var coords: Vector2 = convert_to_real_coords(points[i])
-		var coords2: Vector2 = convert_to_real_coords(points[points.size() - i - 1])
-		if(left): animProgLeft = coords.x
-		if(right): animProgRight = coords2.x
 		if(i + 1 != points.size() && points[i + 1].x > limit): break
 		#print(points[i])
 		if(left): 
-			coordLabel.text = "(%.0f, " % coords.x + "%.3f" % coords.y + ")"
-			rect.position = points[i] - rect.size/2
-			coordLabel.position = rect.position + rect.size/2
-			coordLabel.check_coords()
-		if(right): 
-			coordLabel2.text = "(%.0f, " % coords2.x + "%.3f" % coords2.y + ")"
-			rect2.position = points[points.size() - i - 1] - rect2.size/2
-			coordLabel2.position = rect2.position + rect2.size/2
+			if(points[i].x < limit):
+				var coords: Vector2 = convert_to_real_coords(points[i])
+				animProgLeft = convert_to_real_coords(Vector2(i, 0)).x
+				coordLabel.text = "(%.0f, " % coords.x + "%.3f" % coords.y + ")"
+				rect.position = points[i] - rect.size/2
+				coordLabel.position = rect.position + rect.size/2
+				coordLabel.check_coords()
+		if(right && j != 0): 
+			if(points[points.size() - j].x > limit):
+				animProgRight = convert_to_real_coords(Vector2(window_size.x - j, 0)).x
+				var coords2: Vector2 = convert_to_real_coords(points[points.size() - j])
+				coordLabel2.text = "(%.0f, " % coords2.x + "%.3f" % coords2.y + ")"
+				rect2.position = points[points.size() - j] - rect2.size/2
+				coordLabel2.position = rect2.position + rect2.size/2
+		elif(right):
+			if(coordLabel != null && coordLabel.position.x + coordLabel.size.x > coordLabel2.position.x && coordLabel.position.y < coordLabel2.position.y + coordLabel2.size.y):
+				coordLabel2.position.y = coordLabel2.position.y - coordLabel2.size.y
 			coordLabel2.check_coords()
 		await get_tree().create_timer(speed).timeout
 		speed *= rate
 		i += 1
+		if(i != 1): j += 1
 		queue_redraw()
 	animProgLeft = convert_to_real_coords(Vector2(-1,0)).x
 	animProgRight = convert_to_real_coords(Vector2(200000,0)).x
