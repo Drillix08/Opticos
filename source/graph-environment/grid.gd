@@ -18,9 +18,11 @@ var animProgLeft: float = convert_to_real_coords(Vector2(-1,0)).x
 var animProgRight: float = convert_to_real_coords(Vector2(200000,0)).x
 var animating: bool = false
 
+# for derivative
 var secant_line_left: Vector2 = Vector2(0, 0)
 var secant_line_right: Vector2 = Vector2(0, 0)
 
+# for integration
 var rectangles: Array[Rect2]
 
 var labelOffset = 0
@@ -57,11 +59,15 @@ func _draw():
 		#draw vertical gridline
 		draw_line(Vector2(x+xOffset, yOffset-grid_spacing), Vector2(x+xOffset, 2*window_size.y+yOffset-grid_spacing), color, gridline_thickness)
 		#draw an x-axis tick
+		@warning_ignore("integer_division")
 		var xTickPos = window_height/2
+		@warning_ignore("integer_division")
 		draw_line(Vector2(x+xOffset, xTickPos-grid_spacing/5+origin.y), Vector2(x+xOffset, xTickPos+grid_spacing/5+origin.y), Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
 		#draw the number label above the x-axis tick
 		var text_width = 25
+		@warning_ignore("integer_division")
 		var draw_position = Vector2(x+xOffset-text_width/3, xTickPos-grid_spacing/5+origin.y-grid_spacing/15)
+		@warning_ignore("integer_division")
 		var text_to_draw = str((x-window_width/2)/grid_spacing - int((origin.x-sign(origin.x))/grid_spacing))
 		var text_color = Color(0.541, 0.565, 0.541, 1.0) # White color
 		if(text_to_draw != "0"): draw_string(ThemeDB.fallback_font, draw_position, text_to_draw, HORIZONTAL_ALIGNMENT_LEFT, 100, text_width, text_color)
@@ -76,17 +82,23 @@ func _draw():
 		#Draw horizontal gridline
 		draw_line(Vector2(xOffset-grid_spacing, y+yOffset), Vector2(2*window_size.x+xOffset-grid_spacing, y+yOffset), color, gridline_thickness)
 		#draw a y-axis tick
+		@warning_ignore("integer_division")
 		var yTickPos = window_width/2
+		@warning_ignore("integer_division")
 		draw_line(Vector2(yTickPos-grid_spacing/5+origin.x, y+yOffset), Vector2(yTickPos+grid_spacing/5+origin.x, y+yOffset), Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
 		#draw the number label above the y-axis tick
 		var text_width = 25
+		@warning_ignore("integer_division")
 		var draw_position = Vector2(yTickPos+grid_spacing/15+origin.x, y+yOffset-text_width/3)
+		@warning_ignore("integer_division")
 		var text_to_draw = str(-1*((y-window_height/2)/grid_spacing - int((origin.y-sign(origin.y))/grid_spacing)))
 		var text_color = Color(0.541, 0.565, 0.541, 1.0) # White color
 		draw_string(ThemeDB.fallback_font, draw_position, text_to_draw, HORIZONTAL_ALIGNMENT_LEFT, 100, text_width, text_color)
 	#Draw x-axis
+	@warning_ignore("integer_division")
 	draw_line(Vector2(-origin.x, window_height/2) + origin, Vector2(window_width-origin.x, window_height/2) + origin, Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
 	#draw y-axis
+	@warning_ignore("integer_division")
 	draw_line(Vector2(window_width/2, -origin.y) + origin, Vector2(window_width/2, window_height-origin.y) + origin, Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
 	
 	#draw_line(Vector2(0.0, 385.0076), Vector2(1000.0, 646.5566), Color.YELLOW)
@@ -99,8 +111,10 @@ func _draw():
 	)
 	
 	draw_line(secant_line_left, secant_line_right, Color.YELLOW)
-	for rectangle in rectangles: draw_rect(rectangle, Color.YELLOW)
-
+	for rectangle in rectangles: 
+		draw_rect(rectangle, Color.YELLOW) 
+		if rectangle.size[0] > 1: # do not draw the border on the final iteration
+			draw_rect(rectangle, Color.BLACK, false, 1) # rectangle outline
 	
 #controlls the moving of the "camera" when you click and drag
 func _input(event):
@@ -123,7 +137,8 @@ func _input(event):
 	if Input.is_key_pressed(KEY_D):
 		animate_derivative(1)
 	if Input.is_key_pressed(KEY_I):
-		animate_Integral()
+		# LEFT, RIGHT, TRAPEZOIDAL
+		animate_Integral("LEFT")
 
 ## This function will draw the graph of the function specified by input_function
 ## The argument of this function should be a function that takes a single argument x and returns y
@@ -444,38 +459,45 @@ func animate_derivative(x: float):
 	secant_line_right = Vector2.ZERO
 	queue_redraw()
 	
-func animate_Integral():
+func animate_Integral(type: String):
+	if type not in ["LEFT", "RIGHT"]:
+		print("Invalid argument")
+		return
 	animating = true
 	$AnimationControls.visible = true
 	
 	#var speed = .0015
 	var speed = 1
-	var maxRectangleCount: int = len(functionValues)-1
+	var maxRectangleCount: int = len(functionValues)-2
 	var currentRectangleCount: int = 2
 	while currentRectangleCount <= maxRectangleCount:
-		if(pause):
+		if(pause): 
 			await do_something
 			frameOffset = 0
 		@warning_ignore("integer_division")
 		var increment = maxRectangleCount/currentRectangleCount
 		
 		# left side Riemann sum
-		for i in range(1, maxRectangleCount-increment+1, increment-1):
-			var rect_position: Vector2 = functionValues[i]
+		for i in range(1, maxRectangleCount-increment, increment):
+			var rect_position: Vector2
+			if type == "LEFT":
+				rect_position = functionValues[i]
+			elif type == "RIGHT":
+				rect_position = functionValues[i+increment-1]
+				rect_position[0] -= increment
 			var width: float = increment
 			var height: float = convert_to_real_coords(rect_position)[1]
-			# if the height
 			var rect_size: Vector2 = Vector2(width, height)
 			rectangles.append(Rect2(rect_position, rect_size))
-		queue_redraw()	
+		# calculate current area
+		queue_redraw()
 		await get_tree().create_timer(speed).timeout
 		rectangles.clear()
 		currentRectangleCount *= 2
-	
+	queue_redraw()
 	animating = false
 	$AnimationControls.visible = false
 	
-
 func _on_play_pause_pressed() -> void:
 	pause = !pause
 	if(!pause): 
@@ -483,7 +505,6 @@ func _on_play_pause_pressed() -> void:
 		$AnimationControls/PlayPause.text = "Pause"
 	else:
 		$AnimationControls/PlayPause.text = "Play"
-
 
 func _on_next_pressed() -> void:
 	do_something.emit()
