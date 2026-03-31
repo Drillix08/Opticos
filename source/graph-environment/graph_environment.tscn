@@ -40,6 +40,6 @@ text = ">"
 layout_mode = 2
 text = "<"
 
-[connection signal="pressed" from="Control/Animator/AnimationControls/PlayPause" to="Control" method="_on_play_pause_pressed"]
-[connection signal="pressed" from="Control/Animator/AnimationControls/Next" to="Control" method="_on_next_pressed"]
-[connection signal="pressed" from="Control/Animator/AnimationControls/Back" to="Control" method="_on_back_pressed"]
+[connection signal="pressed" from="Control/Animator/AnimationControls/PlayPause" to="Control/Animator" method="_on_play_pause_pressed"]
+[connection signal="pressed" from="Control/Animator/AnimationControls/Next" to="Control/Animator" method="_on_next_pressed"]
+[connection signal="pressed" from="Control/Animator/AnimationControls/Back" to="Control/Animator" method="_on_back_pressed"]

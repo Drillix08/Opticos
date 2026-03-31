@@ -96,16 +96,15 @@ func _draw():
 		return tan(x)
 	)
 	
-	
 #controlls the moving of the "camera" when you click and drag
 func _input(event):
 	if($Animator.animating):
-		if Input.is_key_pressed(KEY_LEFT):
-			#_on_back_pressed()
-			pass
+		if Input.is_key_pressed(KEY_LEFT) and $Animator.animating:
+			$Animator._on_back_pressed()
 		if Input.is_key_pressed(KEY_RIGHT) and $Animator.animating:
-			#_on_next_pressed()
-			pass
+			$Animator._on_next_pressed()
+		if Input.is_key_pressed(KEY_SPACE) and $Animator.animating:
+			$Animator._on_play_pause_pressed()
 		return
 	if event is InputEventMouseButton\
 	and event.button_index == MOUSE_BUTTON_LEFT:
@@ -120,7 +119,7 @@ func _input(event):
 	if event.is_action_pressed("zoom_in"):
 		print("scroll")
 	if event.is_action_pressed("ui_accept"):
-		$Animator.prepare_to_animate(origin, grid_spacing)
+		$Animator.prepare_to_animate(functionValues, origin, grid_spacing)
 		$Animator.animProgLeft = Util.convert_to_real_coords(origin, Vector2(0,0)).x
 		$Animator.animate_Limit(200, functionValues, true, true, .015, 1.001)
 	if Input.is_key_pressed(KEY_D):

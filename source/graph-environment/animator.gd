@@ -199,9 +199,13 @@ func animate_derivative(x: float):
 		rect.position = functionValues[i] - rect.size/2
 		coordLabel.position = rect.position + rect.size/2
 		if(pause):
-			await do_something
-			i += frameOffset
-			frameOffset = 0
+			var action: int = await do_something
+			if action == -1:
+				i += 2
+				i = min(i, len(functionValues))
+			if action == 0:
+				i += 1
+				i = min(i, len(functionValues))
 		var pos: Vector2 = Util.convert_to_real_coords(origin, functionValues[i])/grid_spacing # the point representing h
 		# calculate the secant line
 		# y = mx + b
@@ -255,8 +259,15 @@ func animate_Integral(type: String):
 	var currentRectangleCount: int = 2
 	while currentRectangleCount <= maxRectangleCount:
 		if(pause): 
-			await do_something
-			frameOffset = 0
+			var action: int = await do_something
+			if action == -1:
+				@warning_ignore("integer_division")
+				currentRectangleCount /= 4
+				currentRectangleCount = max(1, currentRectangleCount)
+			if action == 0:
+				@warning_ignore("integer_division")
+				currentRectangleCount /= 2
+				currentRectangleCount = max(1, currentRectangleCount)
 		@warning_ignore("integer_division")
 		var increment = maxRectangleCount/currentRectangleCount
 		
@@ -272,9 +283,11 @@ func animate_Integral(type: String):
 			var height: float = Util.convert_to_real_coords(origin, rect_position)[1]
 			var rect_size: Vector2 = Vector2(width, height)
 			rectangles.append(Rect2(rect_position, rect_size))
-		# calculate current area
 		queue_redraw()
-		await get_tree().create_timer(speed).timeout
+		if !pause:
+			await get_tree().create_timer(speed).timeout
+		else:
+			await get_tree().create_timer(0.001).timeout
 		rectangles.clear()
 		currentRectangleCount *= 2
 	queue_redraw()
@@ -284,14 +297,13 @@ func animate_Integral(type: String):
 func _on_play_pause_pressed() -> void:
 	pause = !pause
 	if(!pause): 
-		do_something.emit()
+		do_something.emit(0)
 		$AnimationControls/PlayPause.text = "Pause"
 	else:
 		$AnimationControls/PlayPause.text = "Play"
 
 func _on_next_pressed() -> void:
-	do_something.emit()
+	do_something.emit(1)
 
 func _on_back_pressed() -> void:
-	if(pause): frameOffset = -2
-	do_something.emit()
+	do_something.emit(-1)
