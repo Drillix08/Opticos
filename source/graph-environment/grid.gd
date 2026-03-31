@@ -118,7 +118,12 @@ func _draw():
 	
 #controlls the moving of the "camera" when you click and drag
 func _input(event):
-	if(animating): return
+	if(animating):
+		if Input.is_key_pressed(KEY_LEFT):
+			_on_back_pressed()
+		if Input.is_key_pressed(KEY_RIGHT) and animating:
+			_on_next_pressed()
+		return
 	if event is InputEventMouseButton\
 	and event.button_index == MOUSE_BUTTON_LEFT:
 		isDragging = event.pressed
@@ -279,7 +284,8 @@ func convert_to_godot_coords(vec: Vector2):
 
 ## Function for animating values approaching a limit from left and/or right position
 ## initially at [code]speed[/code] seconds per point slowing at a rate of [code]rate[/code] per point
-func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool, speed: float, rate: float):
+func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool, speed: float, rate: float, step: int = 1):
+	step -= 1
 	if(!(right || left)): return 
 	animating = true
 	var endpoint: float = convert_to_godot_coords(Vector2(limit,0)).x
@@ -312,6 +318,8 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 	
 	var coordLabel: CoordLabel = null
 	var coordLabel2: CoordLabel = null
+	var rDone: bool = true
+	if right: rDone = false
 	if(left):
 		coordLabel = CoordLabel.new()
 		add_child(coordLabel)
@@ -326,9 +334,14 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 	while (i < points.size()):
 		if(pause):
 			await do_something
-			i += frameOffset
+			if(i != 1): i += frameOffset
+			if(frameOffset != 0 && i - step > 0): i -= step
+			if(frameOffset == 0 && i + step < points.size()): i += step
+			if(j > 2): j += frameOffset
+			if(frameOffset != 0 && j - step > 2): j -= step
+			if(frameOffset == 0 && j + step < points.size()): j += step
 			frameOffset = 0
-		if(i + 1 != points.size() && points[i + 1].x > limit): break
+		if(i + 1 != points.size() && points[i + 1].x > limit && rDone): break
 		#print(points[i])
 		if(left): 
 			if(points[i].x < limit):
@@ -345,6 +358,8 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 				coordLabel2.text = "(%.0f, " % coords2.x + "%.3f" % coords2.y + ")"
 				rect2.position = points[points.size() - j] - rect2.size/2
 				coordLabel2.position = rect2.position + rect2.size/2
+				coordLabel2.check_coords()
+			else: rDone = true
 		elif(right):
 			if(coordLabel != null && coordLabel.position.x + coordLabel.size.x > coordLabel2.position.x && coordLabel.position.y < coordLabel2.position.y + coordLabel2.size.y):
 				coordLabel2.position.y = coordLabel2.position.y - coordLabel2.size.y
@@ -449,6 +464,7 @@ func animate_derivative(x: float):
 	
 	$AnimationControls.visible = false
 	animating = false
+	animProgLeft = convert_to_real_coords(Vector2(-1,0)).x
 	
 	# freeing components added to the script
 	rect.free()
@@ -510,5 +526,5 @@ func _on_next_pressed() -> void:
 	do_something.emit()
 
 func _on_back_pressed() -> void:
-	if(pause): frameOffset -= 2
+	if(pause): frameOffset = -2
 	do_something.emit()
