@@ -15,6 +15,10 @@ run/main_scene="uid://dlgeh0w3vomer"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+Util="*res://Util/Util.gd"
+
 [display]
 
 window/size/viewport_width=1000

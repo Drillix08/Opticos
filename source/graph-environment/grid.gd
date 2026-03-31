@@ -14,8 +14,8 @@ signal do_something
 var pause: bool = false
 var frameOffset: int = 0
 var functionValues: Array[Vector2] = [Vector2(-1, -1)]
-var animProgLeft: float = convert_to_real_coords(Vector2(-1,0)).x
-var animProgRight: float = convert_to_real_coords(Vector2(200000,0)).x
+var animProgLeft: float = Util.convert_to_real_coords(origin, Vector2(-1,0)).x
+var animProgRight: float = Util.convert_to_real_coords(origin, Vector2(200000,0)).x
 var animating: bool = false
 
 # for derivative
@@ -132,12 +132,12 @@ func _input(event):
 		var delta :Vector2 = event.position - lastMousePos
 		origin += delta
 		lastMousePos = event.position
-		animProgLeft = convert_to_real_coords(Vector2(-1,0)).x
+		animProgLeft = Util.convert_to_real_coords(origin, Vector2(-1,0)).x
 		queue_redraw()
 	if event.is_action_pressed("zoom_in"):
 		print("scroll")
 	if event.is_action_pressed("ui_accept"):
-		animProgLeft = convert_to_real_coords(Vector2(0,0)).x
+		animProgLeft = Util.convert_to_real_coords(origin, Vector2(0,0)).x
 		animate_Limit(200, functionValues, true, true, .015, 1.001)
 	if Input.is_key_pressed(KEY_D):
 		animate_derivative(1)
@@ -261,26 +261,12 @@ func draw_function(input_function: Callable):
 		if y0 == -INF: y0 = bottom
 		if y1 == INF: y1 = top
 		if y1 == -INF: y1 = bottom
-		if (animating && animProgLeft > x1): draw_line(convert_to_godot_coords(Vector2(x0, y0)), convert_to_godot_coords(Vector2(x1, y1)), Color.YELLOW, 2)
-		elif(animating && animProgRight < x0): draw_line(convert_to_godot_coords(Vector2(x0, y0)), convert_to_godot_coords(Vector2(x1, y1)), Color.YELLOW, 2)
-		else: draw_line(convert_to_godot_coords(Vector2(x0, y0)), convert_to_godot_coords(Vector2(x1, y1)), Color.RED, 2)
-		if(!animating): functionValues.append(convert_to_godot_coords(Vector2(x0,y0)))
+		if (animating && animProgLeft > x1): draw_line(Util.convert_to_godot_coords(origin, Vector2(x0, y0)), Util.convert_to_godot_coords(origin, Vector2(x1, y1)), Color.YELLOW, 2)
+		elif(animating && animProgRight < x0): draw_line(Util.convert_to_godot_coords(origin, Vector2(x0, y0)), Util.convert_to_godot_coords(origin, Vector2(x1, y1)), Color.YELLOW, 2)
+		else: draw_line(Util.convert_to_godot_coords(origin, Vector2(x0, y0)), Util.convert_to_godot_coords(origin, Vector2(x1, y1)), Color.RED, 2)
+		if(!animating): functionValues.append(Util.convert_to_godot_coords(origin, Vector2(x0,y0)))
 		left += 1;
 	return functionValues
-
-## this function converts Godot coordinates to the equivilent in an xy plane.
-## for example, the top left of the screen which is normally (0,0) will become (-x,y)
-func convert_to_real_coords(vec: Vector2):
-	var windowSize :Vector2 = DisplayServer.window_get_size()
-	var true_origin = Vector2(origin[0]+windowSize[0]/2, origin[1]+windowSize[1]/2)
-	return Vector2(vec[0]-true_origin[0], true_origin[1]-vec[1])
-	
-## this function converts xy coordinates to their equivalent in Godot.
-## for example, the origin which is normally (0, 0) would become (screenwidth/2, screenheight/2)
-func convert_to_godot_coords(vec: Vector2):
-	var windowSize :Vector2 = DisplayServer.window_get_size()
-	var true_origin = Vector2(origin[0]+windowSize[0]/2, origin[1]+windowSize[1]/2)
-	return Vector2(vec[0]+true_origin[0], true_origin[1]-vec[1])
 
 ## Function for animating values approaching a limit from left and/or right position
 ## initially at [code]speed[/code] seconds per point slowing at a rate of [code]rate[/code] per point
@@ -288,7 +274,7 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 	step -= 1
 	if(!(right || left)): return 
 	animating = true
-	var endpoint: float = convert_to_godot_coords(Vector2(limit,0)).x
+	var endpoint: float = Util.convert_to_godot_coords(origin, Vector2(limit,0)).x
 	var limit_point: TextureRect = null
 	for coords in points:
 		if coords.x == limit:
@@ -345,16 +331,16 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 		#print(points[i])
 		if(left): 
 			if(points[i].x < limit):
-				var coords: Vector2 = convert_to_real_coords(points[i])
-				animProgLeft = convert_to_real_coords(Vector2(i, 0)).x
+				var coords: Vector2 = Util.convert_to_real_coords(origin, points[i])
+				animProgLeft = Util.convert_to_real_coords(origin, Vector2(i, 0)).x
 				coordLabel.text = "(%.0f, " % coords.x + "%.3f" % coords.y + ")"
 				rect.position = points[i] - rect.size/2
 				coordLabel.position = rect.position + rect.size/2
 				coordLabel.check_coords()
 		if(right && j != 0): 
 			if(points[points.size() - j].x > limit):
-				animProgRight = convert_to_real_coords(Vector2(window_size.x - j, 0)).x
-				var coords2: Vector2 = convert_to_real_coords(points[points.size() - j])
+				animProgRight = Util.convert_to_real_coords(origin, Vector2(window_size.x - j, 0)).x
+				var coords2: Vector2 = Util.convert_to_real_coords(origin, points[points.size() - j])
 				coordLabel2.text = "(%.0f, " % coords2.x + "%.3f" % coords2.y + ")"
 				rect2.position = points[points.size() - j] - rect2.size/2
 				coordLabel2.position = rect2.position + rect2.size/2
@@ -369,8 +355,8 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 		i += 1
 		if(i != 1): j += 1
 		queue_redraw()
-	animProgLeft = convert_to_real_coords(Vector2(-1,0)).x
-	animProgRight = convert_to_real_coords(Vector2(200000,0)).x
+	animProgLeft = Util.convert_to_real_coords(origin, Vector2(-1,0)).x
+	animProgRight = Util.convert_to_real_coords(origin, Vector2(200000,0)).x
 	animating = false
 	$AnimationControls.visible = false
 	if(left): 
@@ -398,8 +384,8 @@ func animate_derivative(x: float):
 	# finding point representing x in functionValues
 	var found = false
 	for point in functionValues:
-		if convert_to_real_coords(point)[0] == x:
-			target = convert_to_real_coords(point)/grid_spacing
+		if Util.convert_to_real_coords(origin, point)[0] == x:
+			target = Util.convert_to_real_coords(origin, point)/grid_spacing
 			#drawing a point at the target derivative location
 			target_point.texture = load("res://Solid_Black_Circle.png")
 			target_point.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -426,16 +412,16 @@ func animate_derivative(x: float):
 	add_child(rect)		
 	var coordLabel: CoordLabel = CoordLabel.new()
 	add_child(coordLabel)
-	while convert_to_real_coords(functionValues[i])[0] > int(x):
+	while Util.convert_to_real_coords(origin, functionValues[i])[0] > int(x):
 		# update position of the current position adjusted for offset
-		coordLabel.text = "(%.0f, " % convert_to_real_coords(functionValues[i])[0] + "%.3f" % convert_to_real_coords(functionValues[i])[1] + ")"
+		coordLabel.text = "(%.0f, " % Util.convert_to_real_coords(origin, functionValues[i])[0] + "%.3f" % Util.convert_to_real_coords(origin, functionValues[i])[1] + ")"
 		rect.position = functionValues[i] - rect.size/2
 		coordLabel.position = rect.position + rect.size/2
 		if(pause):
 			await do_something
 			i += frameOffset
 			frameOffset = 0
-		var pos: Vector2 = convert_to_real_coords(functionValues[i])/grid_spacing # the point representing h
+		var pos: Vector2 = Util.convert_to_real_coords(origin, functionValues[i])/grid_spacing # the point representing h
 		# calculate the secant line
 		# y = mx + b
 		var m: float = ( pos[1] - target[1] ) / ( pos[0] - target[0] )
@@ -452,19 +438,19 @@ func animate_derivative(x: float):
 		y0 *= grid_spacing
 		y1 *= grid_spacing
 		
-		secant_line_left = convert_to_godot_coords(Vector2(x0, y0))
-		secant_line_right = convert_to_godot_coords(Vector2(x1, y1))
+		secant_line_left = Util.convert_to_godot_coords(origin, Vector2(x0, y0))
+		secant_line_right = Util.convert_to_godot_coords(origin, Vector2(x1, y1))
 		queue_redraw()
 		await get_tree().create_timer(speed).timeout
 		i -= 1
 	#perform one more update after the fact
-	coordLabel.text = "(%.0f, " % convert_to_real_coords(functionValues[i])[0] + "%.3f" % convert_to_real_coords(functionValues[i])[1] + ")"
+	coordLabel.text = "(%.0f, " % Util.convert_to_real_coords(origin, functionValues[i])[0] + "%.3f" % Util.convert_to_real_coords(origin, functionValues[i])[1] + ")"
 	rect.position = functionValues[i] - rect.size/2
 	coordLabel.position = rect.position + rect.size/2
 	
 	$AnimationControls.visible = false
 	animating = false
-	animProgLeft = convert_to_real_coords(Vector2(-1,0)).x
+	animProgLeft = Util.convert_to_real_coords(origin, Vector2(-1,0)).x
 	
 	# freeing components added to the script
 	rect.free()
@@ -502,7 +488,7 @@ func animate_Integral(type: String):
 				rect_position = functionValues[i+increment-1]
 				rect_position[0] -= increment
 			var width: float = increment
-			var height: float = convert_to_real_coords(rect_position)[1]
+			var height: float = Util.convert_to_real_coords(origin, rect_position)[1]
 			var rect_size: Vector2 = Vector2(width, height)
 			rectangles.append(Rect2(rect_position, rect_size))
 		# calculate current area
