@@ -100,15 +100,17 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 		add_child(rect2)
 		coordLabel2 = CoordLabel.new()
 		add_child(coordLabel2)
-	
-	var i: int = 1
-	var j: int = functionValues.size() - 1
+	var distanceFromLimit = max(endpoint, abs(window_size.x - endpoint))
+	var i: int = endpoint - distanceFromLimit
+	var j: int = endpoint + distanceFromLimit
 	print(functionValues[1])
-	print(j)
-	if(j - endpoint > endpoint): #start from right
-		if(right):
-			while(j - endpoint > endpoint):
-				update_position(functionValues[j], rect2, coordLabel2)
+	print(endpoint)
+	while(i < endpoint):
+		var xL = Util.convert_to_real_coords(Vector2(i, 0), origin)
+		var xR = Util.convert_to_real_coords(Vector2(j, 0), origin)
+		print(xL, " and ", xR)
+		i += 1
+		j -= 1
 	#while (i < points.size()):
 		#if(pause):
 			#await do_something
@@ -120,7 +122,7 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 			#if(frameOffset == 0 && j + step < points.size()): j += step
 			#frameOffset = 0
 		#if(i + 1 != points.size() && points[i + 1].x > limit && rDone): break
-		##print(points[i])
+		#print(points[i])
 		#if(left): 
 			#if(points[i].x < limit):
 				#var coords: Vector2 = Util.convert_to_real_coords(origin, points[i])
