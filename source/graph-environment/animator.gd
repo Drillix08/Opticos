@@ -13,6 +13,7 @@ var grid_spacing :int = 100
 var gridline_thickness :float = 1.0
 
 var functionValues: Array[Vector2] = [Vector2(-1, -1)]
+var functionLines: Array[Array]
 var animProgLeft: float = Util.convert_to_real_coords(origin, Vector2(-1,0)).x
 var animProgRight: float = Util.convert_to_real_coords(origin, Vector2(200000,0)).x
 
@@ -39,13 +40,17 @@ func _draw() -> void:
 		draw_rect(rectangle, Color.YELLOW) 
 		if rectangle.size[0] > 1: # do not draw the border on the final iteration
 			draw_rect(rectangle, Color.BLACK, false, 1) # rectangle outline
+	# this if for drawing on top of integral
+	for line in functionLines:
+		draw_line(line[0], line[1], Color.RED, 2)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
 	pass
 
-func prepare_to_animate(_function_values: Array[Vector2], _origin: Vector2, _grid_spacing: int):
+func prepare_to_animate(_function_values: Array[Vector2], _origin: Vector2, _grid_spacing: int, _functionLines: Array[Array]):
 	functionValues = _function_values
+	functionLines = _functionLines
 	origin = _origin
 	grid_spacing = _grid_spacing
 
@@ -308,6 +313,7 @@ func animate_Integral(type: String):
 	pause = false
 	animating = false
 	$AnimationControls.visible = false
+	functionLines.clear()
 	
 func _on_play_pause_pressed() -> void:
 	pause = !pause
