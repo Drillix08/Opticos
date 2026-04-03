@@ -54,6 +54,7 @@ func test_graph_plotting():
 		for origin in origins:
 			grid.origin = origin
 			var points: Array[Vector2] = grid.draw_function(functions[i])
+			@warning_ignore("integer_division")
 			for j in range(1, len(points), len(points)/10):
 				var point = grid.convert_to_real_coords(points[j])
 				point /= grid.grid_spacing
