@@ -206,7 +206,7 @@ func animate_derivative(x: float):
 	add_child(coordLabel)
 	while Util.convert_to_real_coords(origin, functionValues[i])[0] > int(x):
 		# update position of the current position adjusted for offset
-		coordLabel.text = "(%.0f, " % Util.convert_to_real_coords(origin, functionValues[i])[0] + "%.3f" % Util.convert_to_real_coords(origin, functionValues[i])[1] + ")"
+		coordLabel.text = "(%.3f, " % (Util.convert_to_real_coords(origin, functionValues[i])[0]/grid_spacing) + "%.3f" % (Util.convert_to_real_coords(origin, functionValues[i])[1]/grid_spacing) + ")"
 		rect.position = functionValues[i] - rect.size/2
 		coordLabel.position = rect.position + rect.size/2
 		if(pause):
@@ -246,6 +246,7 @@ func animate_derivative(x: float):
 	
 	$AnimationControls.visible = false
 	animating = false
+	pause = false
 	animProgLeft = Util.convert_to_real_coords(origin, Vector2(-1,0)).x
 	
 	# freeing components added to the script
@@ -302,6 +303,7 @@ func animate_Integral(type: String):
 		rectangles.clear()
 		currentRectangleCount *= 2
 	queue_redraw()
+	pause = false
 	animating = false
 	$AnimationControls.visible = false
 	

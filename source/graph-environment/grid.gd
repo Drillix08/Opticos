@@ -93,17 +93,17 @@ func _draw():
 	
 	#Draw the function
 	draw_function(func(x):
-		return tan(x)
+		return x
 	)
 	
 #controlls the moving of the "camera" when you click and drag
 func _input(event):
 	if($Animator.animating):
-		if Input.is_key_pressed(KEY_LEFT) and $Animator.animating:
+		if Input.is_key_pressed(KEY_LEFT):
 			$Animator._on_back_pressed()
-		if Input.is_key_pressed(KEY_RIGHT) and $Animator.animating:
+		if Input.is_key_pressed(KEY_RIGHT):
 			$Animator._on_next_pressed()
-		if Input.is_key_pressed(KEY_SPACE) and $Animator.animating:
+		if Input.is_key_pressed(KEY_SPACE):
 			$Animator._on_play_pause_pressed()
 		return
 	if event is InputEventMouseButton\
