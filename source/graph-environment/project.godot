@@ -21,7 +21,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-Util="*res://Util/Util.gd"
+GiNaC="*uid://bu8171anqul0s"
 
 [display]
 
