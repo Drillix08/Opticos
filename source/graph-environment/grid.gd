@@ -121,7 +121,7 @@ func _input(event):
 	if event.is_action_pressed("ui_accept"):
 		$Animator.prepare_to_animate(functionValues, origin, grid_spacing)
 		$Animator.animProgLeft = Util.convert_to_real_coords(origin, Vector2(0,0)).x
-		$Animator.animate_Limit(200, functionValues, true, true, .015, 1.001)
+		$Animator.animate_Limit(400, functionValues, true, true, .005, 1)
 	if Input.is_key_pressed(KEY_D):
 		$Animator.prepare_to_animate(functionValues, origin, grid_spacing)
 		$Animator.animate_derivative(1)
