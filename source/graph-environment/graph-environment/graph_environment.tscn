@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://dlgeh0w3vomer"]
+
+[ext_resource type="Script" uid="uid://ctkau5kfofefi" path="res://graph-environment/grid.gd" id="1_17ijq"]
+[ext_resource type="Script" uid="uid://c0a04itj3mecw" path="res://test_ginac.gd" id="2_rcchu"]
+
+[node name="Node2D" type="Node2D" unique_id=1718485483]
+
+[node name="Control" type="Control" parent="." unique_id=889292363]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_17ijq")
+
+[node name="Node" type="Node" parent="." unique_id=557574173]
+script = ExtResource("2_rcchu")
