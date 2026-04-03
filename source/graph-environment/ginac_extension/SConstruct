@@ -1,0 +1,16 @@
+#!/usr/bin/env python
+import os
+
+env = SConscript("godot-cpp/SConstruct")
+
+env.Append(CPPPATH=["src/"])
+
+env.ParseConfig("pkg-config --cflags --libs ginac")
+
+sources = Glob("src/*.cpp")
+
+library = env.SharedLibrary(
+    "bin/libginac_extension{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
+    source=sources,
+)
+Default(library)
