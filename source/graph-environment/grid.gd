@@ -12,6 +12,7 @@ var lastMousePos := Vector2.ZERO
 var origin := Vector2.ZERO
 
 var functionValues: Array[Vector2] = [Vector2(-1, -1)]
+var functionLines: Array[Array]
 
 '''
 If the x or y value of the origin has a distance
@@ -87,13 +88,11 @@ func _draw():
 	@warning_ignore("integer_division")
 	draw_line(Vector2(window_width/2, -origin.y) + origin, Vector2(window_width/2, window_height-origin.y) + origin, Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
 	
-	#draw_line(Vector2(0.0, 385.0076), Vector2(1000.0, 646.5566), Color.YELLOW)
-	
 	queue_redraw()
 	
 	#Draw the function
 	draw_function(func(x):
-		return sin(x) / sqrt(x**2 - 4)
+		return x**2
 	)
 
 #controlls the moving of the "camera" when you click and drag
@@ -119,20 +118,20 @@ func _input(event):
 	if event.is_action_pressed("zoom_in"):
 		print("scroll")
 	if event.is_action_pressed("ui_accept"):
-		$Animator.prepare_to_animate(functionValues, origin, grid_spacing)
+		$Animator.prepare_to_animate(functionValues, origin, grid_spacing, functionLines)
 		$Animator.animProgLeft = Util.convert_to_real_coords(origin, Vector2(0,0)).x
-		$Animator.animate_Limit(200, functionValues, true, true, .015, 1.001)
+		$Animator.animate_Limit(400, functionValues, true, true, .005, 1)
 	if Input.is_key_pressed(KEY_D):
-		$Animator.prepare_to_animate(functionValues, origin, grid_spacing)
+		$Animator.prepare_to_animate(functionValues, origin, grid_spacing, functionLines)
 		$Animator.animate_derivative(1)
 	if Input.is_key_pressed(KEY_I):
-		$Animator.prepare_to_animate(functionValues, origin, grid_spacing)
+		$Animator.prepare_to_animate(functionValues, origin, grid_spacing, functionLines)
 		# LEFT, RIGHT
 		$Animator.animate_Integral("LEFT")
-
 ## This function will draw the graph of the function specified by input_function
 ## The argument of this function should be a function that takes a single argument x and returns y
 func draw_function(input_function: Callable):
+	functionLines.clear()
 	var windowSize :Vector2i = DisplayServer.window_get_size()
 	var left: float = -(origin.x + windowSize.x/2.0)
 	var right: float = left + windowSize.x
@@ -249,7 +248,12 @@ func draw_function(input_function: Callable):
 		if y1 == -INF: y1 = bottom
 		if ($Animator.animating && $Animator.animProgLeft > x1): draw_line(Util.convert_to_godot_coords(origin, Vector2(x0, y0)), Util.convert_to_godot_coords(origin, Vector2(x1, y1)), Color.YELLOW, 2)
 		elif($Animator.animating && $Animator.animProgRight < x0): draw_line(Util.convert_to_godot_coords(origin, Vector2(x0, y0)), Util.convert_to_godot_coords(origin, Vector2(x1, y1)), Color.YELLOW, 2)
-		else: draw_line(Util.convert_to_godot_coords(origin, Vector2(x0, y0)), Util.convert_to_godot_coords(origin, Vector2(x1, y1)), Color.RED, 2)
+		else: 
+			draw_line(Util.convert_to_godot_coords(origin, Vector2(x0, y0)), Util.convert_to_godot_coords(origin, Vector2(x1, y1)), Color.RED, 2)
+			var line: Array[Vector2]
+			line.append(Util.convert_to_godot_coords(origin, Vector2(x0, y0))) 
+			line.append(Util.convert_to_godot_coords(origin, Vector2(x1, y1)))
+			functionLines.append(line)
 		if(!$Animator.animating): functionValues.append(Util.convert_to_godot_coords(origin, Vector2(x0,y0)))
 		left += 1;
 	return functionValues
