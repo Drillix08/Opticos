@@ -1,4 +1,5 @@
 extends Control
+const Util = preload("res://Util/Util.gd")
 
 @export var window_size :Vector2i = DisplayServer.window_get_size()
 var window_width :int = window_size.x

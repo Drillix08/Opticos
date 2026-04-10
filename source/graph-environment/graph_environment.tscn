@@ -1,12 +1,12 @@
-[gd_scene load_steps=4 format=3 uid="uid://dlgeh0w3vomer"]
+[gd_scene format=3 uid="uid://dlgeh0w3vomer"]
 
-[ext_resource type="Script" uid="uid://ctkau5kfofefi" path="res://grid.gd" id="1_17ijq"]
+[ext_resource type="Script" uid="uid://btgwfq06dppqf" path="res://grid.gd" id="1_17ijq"]
 [ext_resource type="Script" uid="uid://b6e8i5j8f21wn" path="res://animation_controls.gd" id="2_tlnqj"]
 [ext_resource type="Script" uid="uid://c2afb1qfcyypw" path="res://animator.gd" id="3_f04b4"]
 
-[node name="Node2D" type="Node2D"]
+[node name="Node2D" type="Node2D" unique_id=1181703709]
 
-[node name="Control" type="Control" parent="."]
+[node name="Control" type="Control" parent="." unique_id=451377513]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -15,28 +15,28 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_17ijq")
 
-[node name="Animator" type="Control" parent="Control"]
+[node name="Animator" type="Control" parent="Control" unique_id=292966536]
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("3_f04b4")
 
-[node name="AnimationControls" type="Container" parent="Control/Animator"]
+[node name="AnimationControls" type="Container" parent="Control/Animator" unique_id=1486893199]
 visible = false
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 8.0
 script = ExtResource("2_tlnqj")
 
-[node name="PlayPause" type="Button" parent="Control/Animator/AnimationControls"]
+[node name="PlayPause" type="Button" parent="Control/Animator/AnimationControls" unique_id=565883921]
 layout_mode = 2
 text = "pause"
 
-[node name="Next" type="Button" parent="Control/Animator/AnimationControls"]
+[node name="Next" type="Button" parent="Control/Animator/AnimationControls" unique_id=782377964]
 layout_mode = 2
 text = ">"
 
-[node name="Back" type="Button" parent="Control/Animator/AnimationControls"]
+[node name="Back" type="Button" parent="Control/Animator/AnimationControls" unique_id=1932808315]
 layout_mode = 2
 text = "<"
 

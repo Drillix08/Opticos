@@ -1,4 +1,6 @@
 extends Control
+const Util = preload("res://Util/Util.gd")
+
 signal do_something(something: int)
 var animating: bool = false
 var stepSize: int = 1
