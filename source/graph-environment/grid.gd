@@ -127,7 +127,7 @@ func _input(event):
 	if Input.is_key_pressed(KEY_I):
 		$Animator.prepare_to_animate(functionValues, origin, grid_spacing, functionLines)
 		# LEFT, RIGHT
-		$Animator.animate_Integral("LEFT")
+		$Animator.animate_Integral("LEFT", -4, 4)
 ## This function will draw the graph of the function specified by input_function
 ## The argument of this function should be a function that takes a single argument x and returns y
 func draw_function(input_function: Callable):

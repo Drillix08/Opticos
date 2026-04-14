@@ -265,33 +265,34 @@ func animate_derivative(x: float):
 	secant_line_right = Vector2.ZERO
 	queue_redraw()
 	
-func animate_Integral(type: String):
+func animate_Integral(type: String, left_bound: float, right_bound: float):
 	if type not in ["LEFT", "RIGHT"]:
 		print("Invalid argument")
 		return
+	if right_bound < left_bound: return
 	animating = true
 	$AnimationControls.visible = true
 	
+	var start: int
+	var end: int
+	for i in range(len(functionValues)):
+		if Util.convert_to_real_coords(origin, functionValues[i])[0] == left_bound*grid_spacing:
+			if i == 0: start = i + 1
+			else: start = i
+		if Util.convert_to_real_coords(origin, functionValues[i])[0] == right_bound*grid_spacing:
+			end = i
 	#var speed = .0015
 	var speed = 1
-	var maxRectangleCount: int = len(functionValues)-2
+	var maxRectangleCount: int = end-start
 	var currentRectangleCount: int = 2
 	while currentRectangleCount <= maxRectangleCount:
-		if(pause): 
-			var action: int = await do_something
-			if action == -1:
-				@warning_ignore("integer_division")
-				currentRectangleCount /= 4
-				currentRectangleCount = max(1, currentRectangleCount)
-			if action == 0:
-				@warning_ignore("integer_division")
-				currentRectangleCount /= 2
-				currentRectangleCount = max(1, currentRectangleCount)
 		@warning_ignore("integer_division")
 		var increment = maxRectangleCount/currentRectangleCount
 		
 		# left side Riemann sum
-		for i in range(1, maxRectangleCount-increment, increment):
+		for i in range(start, end-increment, increment):
+			print(i, " ", end-increment)
+			print("inc: ", increment)
 			var rect_position: Vector2
 			if type == "LEFT":
 				rect_position = functionValues[i]
@@ -309,6 +310,16 @@ func animate_Integral(type: String):
 			await get_tree().create_timer(0.001).timeout
 		rectangles.clear()
 		currentRectangleCount *= 2
+		if(pause): 
+			var action: int = await do_something
+			if action == -1:
+				@warning_ignore("integer_division")
+				currentRectangleCount /= 4
+				currentRectangleCount = max(1, currentRectangleCount)
+			if action == 0:
+				@warning_ignore("integer_division")
+				currentRectangleCount /= 2
+				currentRectangleCount = max(1, currentRectangleCount)
 	queue_redraw()
 	pause = false
 	animating = false
