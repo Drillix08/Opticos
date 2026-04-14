@@ -55,12 +55,11 @@ func prepare_to_animate(_function_values: Array[Vector2], _origin: Vector2, _gri
 	grid_spacing = _grid_spacing
 
 func update_position(point: Vector2, rect: TextureRect, label: CoordLabel):
-	#var coords: Vector2 = Util.convert_to_real_coords(origin, points[i])
-	#animProgLeft = Util.convert_to_real_coords(origin, Vector2(i, 0)).x
-	#coordLabel.text = "(%.0f, " % coords.x + "%.3f" % coords.y + ")"
-	#rect.position = points[i] - rect.size/2
-	#coordLabel.position = rect.position + rect.size/2
-	#coordLabel.check_coords()
+	var coords: Vector2 = Util.convert_to_real_coords(origin, point)
+	label.text = "(%.0f, " % coords.x + "%.3f" % coords.y + ")"
+	rect.position = point - rect.size/2
+	label.position = rect.position + rect.size/2
+	label.check_coords()
 	pass
 
 ## Function for animating values approaching a limit from left and/or right position
@@ -74,7 +73,7 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 	$AnimationControls.visible = true
 	var limit_point: TextureRect = null
 	for coords in points:
-		if coords.x == limit:
+		if coords.x == endpoint:
 			limit_point = TextureRect.new()
 			limit_point.texture = load("res://Black_Circle.png")
 			limit_point.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -82,7 +81,7 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 			limit_point.position = coords - Vector2(10, 10)
 			add_child(limit_point)
 			break
-	
+
 	var rect: TextureRect = null
 	var rect2: TextureRect = null
 	var coordLabel: CoordLabel = null
@@ -106,65 +105,51 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 		coordLabel2 = CoordLabel.new()
 		add_child(coordLabel2)
 	var distanceFromLimit = max(endpoint, abs(window_size.x - endpoint))
+	print(distanceFromLimit)
 	var i: int = endpoint - distanceFromLimit
 	var j: int = endpoint + distanceFromLimit
-	print(functionValues[1])
+	print(i, " ", j)
 	print(endpoint)
 	while(i < endpoint):
-		var xL = Util.convert_to_real_coords(Vector2(i, 0), origin)
-		var xR = Util.convert_to_real_coords(Vector2(j, 0), origin)
-		print(xL, " and ", xR)
+		#Paused stuff
+		if(pause):
+			var action: int = await do_something
+			if(action == -1): #back
+				j += 2
+				i -= 2
+			elif(action == 0): #Play
+				j += 1
+				i -= 1
+		#updating positions
+		if(left && i >= 0): 
+			rect.visible = true
+			coordLabel.visible = true
+			update_position(functionValues[i + 1], rect, coordLabel)
+		else:
+			rect.visible = false
+			coordLabel.visible = false
+		if(right && j + 1 <= window_size.x): 
+			rect2.visible = true
+			coordLabel2.visible = true
+			update_position(functionValues[j + 1], rect2, coordLabel2)
+		else:
+			rect2.visible = false
+			coordLabel2.visible = false
+		if(coordLabel != null && coordLabel.position.x + coordLabel.size.x > coordLabel2.position.x && coordLabel.position.y < coordLabel2.position.y + coordLabel2.size.y):
+			coordLabel2.position.y = coordLabel2.position.y - coordLabel2.size.y
+			coordLabel2.check_coords()
 		i += 1
 		j -= 1
-	#while (i < points.size()):
-		#if(pause):
-			#await do_something
-			#if(i != 1): i += frameOffset
-			#if(frameOffset != 0 && i - step > 0): i -= step
-			#if(frameOffset == 0 && i + step < points.size()): i += step
-			#if(j > 2): j += frameOffset
-			#if(frameOffset != 0 && j - step > 2): j -= step
-			#if(frameOffset == 0 && j + step < points.size()): j += step
-			#frameOffset = 0
-		#if(i + 1 != points.size() && points[i + 1].x > limit && rDone): break
-		#print(points[i])
-		#if(left): 
-			#if(points[i].x < limit):
-				#var coords: Vector2 = Util.convert_to_real_coords(origin, points[i])
-				#animProgLeft = Util.convert_to_real_coords(origin, Vector2(i, 0)).x
-				#coordLabel.text = "(%.0f, " % coords.x + "%.3f" % coords.y + ")"
-				#rect.position = points[i] - rect.size/2
-				#coordLabel.position = rect.position + rect.size/2
-				#coordLabel.check_coords()
-		#if(right && j != 0): 
-			#if(points[points.size() - j].x > limit):
-				#animProgRight = Util.convert_to_real_coords(origin, Vector2(window_size.x - j, 0)).x
-				#var coords2: Vector2 = Util.convert_to_real_coords(origin, points[points.size() - j])
-				#coordLabel2.text = "(%.0f, " % coords2.x + "%.3f" % coords2.y + ")"
-				#rect2.position = points[points.size() - j] - rect2.size/2
-				#coordLabel2.position = rect2.position + rect2.size/2
-				#coordLabel2.check_coords()
-			#else: rDone = true
-		#elif(right):
-			#if(coordLabel != null && coordLabel.position.x + coordLabel.size.x > coordLabel2.position.x && coordLabel.position.y < coordLabel2.position.y + coordLabel2.size.y):
-				#coordLabel2.position.y = coordLabel2.position.y - coordLabel2.size.y
-			#coordLabel2.check_coords()
-		#await get_tree().create_timer(speed).timeout
-		#speed *= rate
-		#i += 1
-		#if(i != 1): j += 1
-		#queue_redraw()
-	#animProgLeft = Util.convert_to_real_coords(origin, Vector2(-1,0)).x
-	#animProgRight = Util.convert_to_real_coords(origin, Vector2(200000,0)).x
-	#animating = false
-	#$AnimationControls.visible = false
-	#if(left): 
-		#rect.queue_free()
-		#coordLabel.queue_free()
-	#if(right):
-		#rect2.queue_free()
-		#coordLabel2.queue_free()
-	#limit_point.queue_free()
+		await get_tree().create_timer(speed).timeout
+		speed *= rate
+	animating = false
+	$AnimationControls.visible = false
+	if(left): 
+		rect.queue_free()
+		coordLabel.queue_free()
+	if(right):
+		rect2.queue_free()
+		coordLabel2.queue_free()
 	
 # using limit definition of derivative
 # f'(x) = lim_{h->0} ( f(x+h) - f(x) ) / h
