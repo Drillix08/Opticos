@@ -1,6 +1,6 @@
 # GiNaC extension - cloned and built locally by each contributor
 source/graph-environment/ginac_extension/godot-cpp/
-source/graph-environment/ginac_extension/bin/
+# source/graph-environment/ginac_extension/bin/
 
 # SCons build artifacts
 source/graph-environment/ginac_extension/.sconsign.dblite
