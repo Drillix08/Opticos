@@ -1,5 +1,7 @@
 extends Control
 signal do_something(something: int)
+signal leftProg(n: int)
+signal rightProg(n: int)
 var animating: bool = false
 var stepSize: int = 1
 var moveDirection
@@ -42,7 +44,8 @@ func _draw() -> void:
 			draw_rect(rectangle, Color.BLACK, false, 1) # rectangle outline
 	# this if for drawing on top of integral
 	for line in functionLines:
-		draw_line(line[0], line[1], Color.RED, 2)
+		if(line[0].x < animProgLeft || line[1].x > animProgRight): draw_line(line[0], line[1], Color.YELLOW, 2)
+		else: draw_line(line[0], line[1], Color.RED, 2)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
@@ -56,7 +59,7 @@ func prepare_to_animate(_function_values: Array[Vector2], _origin: Vector2, _gri
 
 func update_position(point: Vector2, rect: TextureRect, label: CoordLabel):
 	var coords: Vector2 = Util.convert_to_real_coords(origin, point)
-	label.text = "(%.0f, " % coords.x + "%.3f" % coords.y + ")"
+	label.text = "(%.2f, " % (coords.x/100.0) + "%.4f" % (coords.y/100) + ")"
 	rect.position = point - rect.size/2
 	label.position = rect.position + rect.size/2
 	label.check_coords()
@@ -64,11 +67,12 @@ func update_position(point: Vector2, rect: TextureRect, label: CoordLabel):
 
 ## Function for animating values approaching a limit from left and/or right position
 ## initially at [code]speed[/code] seconds per point slowing at a rate of [code]rate[/code] per point
-func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool, speed: float, rate: float, step: int = 1):
+func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool, speed: float, rate: float, _step: int = 1):
 	if(!(right || left)): return 
 	var endpoint: float = Util.convert_to_godot_coords(origin, Vector2(limit,0)).x
+	if(endpoint < 0 || endpoint > window_size.x): return
 	if(endpoint < 0): return
-	step -= 1
+	#step -= 1
 	animating = true
 	$AnimationControls.visible = true
 	var limit_point: TextureRect = null
@@ -110,7 +114,8 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 	var j: int = endpoint + distanceFromLimit
 	print(i, " ", j)
 	print(endpoint)
-	while(i < endpoint):
+	while(i <= endpoint):
+		if(i == endpoint): _on_play_pause_pressed()
 		#Paused stuff
 		if(pause):
 			var action: int = await do_something
@@ -118,8 +123,9 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 				j += 2
 				i -= 2
 			elif(action == 0): #Play
-				j += 1
-				i -= 1
+				if(i != endpoint):
+					j += 1
+					i -= 1
 		#updating positions
 		if(left && i >= 0): 
 			rect.visible = true
@@ -140,6 +146,9 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 			coordLabel2.check_coords()
 		i += 1
 		j -= 1
+		if(left): animProgLeft = i
+		if(right): animProgRight = j
+		queue_redraw()
 		await get_tree().create_timer(speed).timeout
 		speed *= rate
 	animating = false
@@ -150,6 +159,14 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 	if(right):
 		rect2.queue_free()
 		coordLabel2.queue_free()
+	limit_point.queue_free()
+	animProgLeft = Util.convert_to_real_coords(origin, Vector2(-1,0)).x
+	animProgRight = Util.convert_to_real_coords(origin, Vector2(200000,0)).x
+	functionLines = []
+	queue_redraw()
+	pause = false
+	animating = false
+
 	
 # using limit definition of derivative
 # f'(x) = lim_{h->0} ( f(x+h) - f(x) ) / h
