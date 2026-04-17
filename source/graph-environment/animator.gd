@@ -265,6 +265,7 @@ func animate_derivative(x: float):
 	target_point.free()
 	secant_line_left = Vector2.ZERO
 	secant_line_right = Vector2.ZERO
+	functionLines.clear()
 	queue_redraw()
 	
 func animate_Integral(type: String, left_bound: float, right_bound: float):
