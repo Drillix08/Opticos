@@ -273,8 +273,14 @@ func animate_Integral(type: String, left_bound: float, right_bound: float):
 	animating = true
 	$AnimationControls.visible = true
 	
-	var start: int
-	var end: int
+	var area_display: CoordLabel = CoordLabel.new()
+	area_display.position = Vector2(10, 50)
+	add_child(area_display)
+	area_display.text = "Area: 0"
+	
+	# initialize start and end to the left and right bound of the screen
+	var start: int = 1
+	var end: int = len(functionValues)-2
 	for i in range(len(functionValues)):
 		if Util.convert_to_real_coords(origin, functionValues[i])[0] == left_bound*grid_spacing:
 			if i == 0: start = i + 1
@@ -286,13 +292,19 @@ func animate_Integral(type: String, left_bound: float, right_bound: float):
 	var maxRectangleCount: int = end-start
 	var currentRectangleCount: int = 2
 	while currentRectangleCount <= maxRectangleCount:
-		@warning_ignore("integer_division")
-		var increment = maxRectangleCount/currentRectangleCount
 		
+		# makes sure that the rectangles cover the whole bounds
+		var tempRectangleCount = currentRectangleCount 
+		# 3 is the margin of error
+		# requiring a lower margin of error introduces the possibility of error
+		# for example if it had to be perfectly divisibe, it would break for prime numbers
+		while maxRectangleCount % tempRectangleCount > 3:
+			tempRectangleCount += 1
+			
+		@warning_ignore("integer_division")
+		var increment = maxRectangleCount/tempRectangleCount
 		# left side Riemann sum
-		for i in range(start, end-increment, increment):
-			print(i, " ", end-increment)
-			print("inc: ", increment)
+		for i in range(start, end-increment+1, increment):
 			var rect_position: Vector2
 			if type == "LEFT":
 				rect_position = functionValues[i]
@@ -303,6 +315,14 @@ func animate_Integral(type: String, left_bound: float, right_bound: float):
 			var height: float = Util.convert_to_real_coords(origin, rect_position)[1]
 			var rect_size: Vector2 = Vector2(width, height)
 			rectangles.append(Rect2(rect_position, rect_size))
+		# calculate current area
+		var area = 0
+		for rectangle in rectangles:
+			if rectangle.size[1] > 0:
+				area += rectangle.get_area() / (grid_spacing**2)
+			else:
+				area -= rectangle.get_area() / (grid_spacing**2)
+		area_display.text = "Area: %.3f" % area
 		queue_redraw()
 		if !pause:
 			await get_tree().create_timer(speed).timeout
@@ -324,6 +344,7 @@ func animate_Integral(type: String, left_bound: float, right_bound: float):
 	pause = false
 	animating = false
 	$AnimationControls.visible = false
+	area_display.free()
 	functionLines.clear()
 	
 func _on_play_pause_pressed() -> void:

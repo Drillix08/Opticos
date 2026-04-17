@@ -25,8 +25,8 @@ Util="*res://Util/Util.gd"
 
 [display]
 
-window/size/viewport_width=1000
-window/size/viewport_height=800
+window/size/viewport_width=2000
+window/size/viewport_height=1600
 
 [input]
 
