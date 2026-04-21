@@ -22,6 +22,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 GiNaC="*uid://bu8171anqul0s"
+Util="*uid://dl55omom00o6p"
 
 [display]
 

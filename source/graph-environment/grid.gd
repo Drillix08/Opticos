@@ -93,7 +93,7 @@ func _draw():
 	
 	#Draw the function
 	draw_function(func(x):
-		return x**2
+		return (x**2)
 	)
 
 #controlls the moving of the "camera" when you click and drag
@@ -128,7 +128,7 @@ func _input(event):
 	if Input.is_key_pressed(KEY_I):
 		$Animator.prepare_to_animate(functionValues, origin, grid_spacing, functionLines)
 		# LEFT, RIGHT
-		$Animator.animate_Integral("LEFT")
+		$Animator.animate_Integral("LEFT", 0, 2)
 ## This function will draw the graph of the function specified by input_function
 ## The argument of this function should be a function that takes a single argument x and returns y
 func draw_function(input_function: Callable):
