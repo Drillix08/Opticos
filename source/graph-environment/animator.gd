@@ -60,6 +60,7 @@ func prepare_to_animate(_function_values: Array[Vector2], _origin: Vector2, _gri
 func update_position(point: Vector2, rect: TextureRect, label: CoordLabel):
 	var coords: Vector2 = Util.convert_to_real_coords(origin, point)
 	label.text = "(%.2f, " % (coords.x/100.0) + "%.4f" % (coords.y/100) + ")"
+
 	rect.position = point - rect.size/2
 	label.position = rect.position + rect.size/2
 	label.check_coords()
@@ -114,6 +115,7 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 	var j: int = endpoint + distanceFromLimit
 	print(i, " ", j)
 	print(endpoint)
+
 	while(i <= endpoint):
 		if(i == endpoint): _on_play_pause_pressed()
 		#Paused stuff

@@ -1,0 +1,19 @@
+# GiNaC extension - cloned and built locally by each contributor
+source/graph-environment/ginac_extension/godot-cpp/
+source/graph-environment/ginac_extension/bin/
+
+# SCons build artifacts
+source/graph-environment/ginac_extension/.sconsign.dblite
+source/graph-environment/ginac_extension/src/*.os
+
+# Godot-generated files
+source/graph-environment/.godot/
+source/graph-environment/**/*.tmp
+source/graph-environment/**/*.import
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+#godot editor
+Godot_v4.6.2-stable_linux.x86_64

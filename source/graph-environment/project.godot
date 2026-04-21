@@ -21,12 +21,13 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-Util="*res://Util/Util.gd"
+GiNaC="*uid://bu8171anqul0s"
+Util="*uid://dl55omom00o6p"
 
 [display]
 
-window/size/viewport_width=2000
-window/size/viewport_height=1600
+window/size/viewport_width=1000
+window/size/viewport_height=800
 
 [input]
 

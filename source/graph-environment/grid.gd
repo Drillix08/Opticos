@@ -2,7 +2,7 @@ extends Control
 
 @export var window_size :Vector2i = DisplayServer.window_get_size()
 var window_width :int = window_size.x
-var window_height :int = window_size.y 
+var window_height :int = window_size.y
 
 @export var grid_spacing :int = 100
 @export var gridline_thickness :float = 1.0
@@ -31,14 +31,14 @@ func refresh_pixel_positions(xOffset, yOffset):
 			yOffset -= grid_spacing
 		if (yOffset < 0):
 			yOffset += grid_spacing
-			
+	
 	return [xOffset, yOffset]
 
 func _draw():
 	#Draw the vertical lines of the grid
 	for x in range(0, 2*(int(window_size.x)), grid_spacing):
 		var color = Color(0.5, 0.5, 0.5)
-		#offset values the pixel positions of the graph objects 
+		#offset values the pixel positions of the graph objects
 		#have from their original positions when the origin was at initialization
 		var refreshedPosition :Array = refresh_pixel_positions(origin.x, origin.y)
 		var xOffset :float = refreshedPosition[0]
@@ -61,7 +61,7 @@ func _draw():
 	#Draw the horizontal lines of the grid
 	for y in range(0, 2*(int(window_size.y)), grid_spacing):
 		var color = Color(0.5, 0.5, 0.5)
-		#offset values the pixel positions of the graph objects 
+		#offset values the pixel positions of the graph objects
 		#have from their original positions when the origin was at initialization
 		var refreshedPosition :Array = refresh_pixel_positions(origin.x, origin.y)
 		var xOffset :float = refreshedPosition[0]
@@ -94,7 +94,7 @@ func _draw():
 	draw_function(func(x):
 		return (x**2)
 	)
-	
+
 #controlls the moving of the "camera" when you click and drag
 func _input(event):
 	if($Animator.animating):
@@ -120,14 +120,14 @@ func _input(event):
 	if event.is_action_pressed("ui_accept"):
 		$Animator.prepare_to_animate(functionValues, origin, grid_spacing, functionLines)
 		$Animator.animProgLeft = Util.convert_to_real_coords(origin, Vector2(0,0)).x
-		$Animator.animate_Limit(200, functionValues, true, true, .015, 1.001)
+		$Animator.animate_Limit(400, functionValues, true, true, .005, 1)
 	if Input.is_key_pressed(KEY_D):
 		$Animator.prepare_to_animate(functionValues, origin, grid_spacing, functionLines)
 		$Animator.animate_derivative(1)
 	if Input.is_key_pressed(KEY_I):
 		$Animator.prepare_to_animate(functionValues, origin, grid_spacing, functionLines)
 		# LEFT, RIGHT
-		$Animator.animate_Integral("RIGHT", -5, 7)
+		$Animator.animate_Integral("LEFT", 0, 2)
 ## This function will draw the graph of the function specified by input_function
 ## The argument of this function should be a function that takes a single argument x and returns y
 func draw_function(input_function: Callable):
@@ -138,13 +138,13 @@ func draw_function(input_function: Callable):
 	var top: float = origin.y + (windowSize.y / 2.0)
 	var bottom: float = origin.y - (windowSize.y / 2.0)
 	if(!$Animator.animating): functionValues = [Vector2(-1, -1)]
-
+	
 	while(left < right):
 		var x0: float = (left)/grid_spacing
 		var x1: float = (left+1)/grid_spacing
 		var y0: float = input_function.call(x0)
 		var y1: float = input_function.call(x1)
-
+		
 		# figure out the starting point of functions with a left-asymptote
 		if is_nan(y0) && !is_nan(y1):
 			var initialX = x1;
@@ -163,7 +163,7 @@ func draw_function(input_function: Callable):
 					x1 -= step
 			y0 = input_function.call(x0)
 			y1 = input_function.call(x1)
-			if is_nan(y0) || absf(y0) > absf(y1): 
+			if is_nan(y0) || absf(y0) > absf(y1):
 				y0 = y1 * INF
 				y1 = initialY
 				x1 = initialX
@@ -171,11 +171,11 @@ func draw_function(input_function: Callable):
 				y1 = y0 * INF
 				y0 = initialY
 				x0 = initialX
-
+		
 		# figure out the starting point of functions with a right-asymptote
 		elif !is_nan(y0) && is_nan(y1):
-			var initialX = x1;
-			var initialY = y1;
+			var initialX = x0;
+			var initialY = y0;
 			var step: float = 1.0 / grid_spacing
 			for i in range(16):
 				step /= 2
@@ -188,10 +188,10 @@ func draw_function(input_function: Callable):
 					# Went too far
 					x0 += step
 					x1 += step
-
+			
 			y0 = input_function.call(x0)
 			y1 = input_function.call(x1)
-			if is_nan(y0) || absf(y0) > absf(y1): 
+			if is_nan(y0) || absf(y0) > absf(y1):
 				y0 = y1 * INF
 				y1 = initialY
 				x1 = initialX
@@ -199,9 +199,9 @@ func draw_function(input_function: Callable):
 				y1 = y0 * INF
 				y0 = initialY
 				x0 = initialX
-
-		# figure out other types of asymptotes
-		elif absf(y0 - y1) > 200:
+		
+		# figure out diverging asymptotes
+		elif (y0 > 0 && y1 < 0) || (y0 < 0 && y1 > 0):
 			var max_jump: float = absf(y0 - y1)
 			
 			var step: float = 1.0 / grid_spacing
@@ -210,7 +210,6 @@ func draw_function(input_function: Callable):
 				# try to move x0 forward
 				x0 += step
 				y0 = input_function.call(x0)
-				y1 = input_function.call(x1)
 				
 				if absf(y0 - y1) > max_jump:
 					max_jump = absf(y0 - y1)
@@ -218,17 +217,19 @@ func draw_function(input_function: Callable):
 				
 				# Went too far, try moving x1 back instead
 				x0 -= step
-				x1 -= step
 				y0 = input_function.call(x0)
+				
+				x1 -= step
 				y1 = input_function.call(x1)
+				
 				if absf(y0 - y1) > max_jump:
 					max_jump = absf(y0 - y1)
 					continue # Worked! So move on
-					
+				
 				# Still too far, reset back to initial to try again
-				# With a smaller step size
+				# but with a smaller step size
 				x1 += step
-
+			
 			# If we narrowed the jump down to a small enough step size,
 			# while still maintaing the size of the jump,
 			# then it's likely an asymptote
