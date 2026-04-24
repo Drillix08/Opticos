@@ -166,7 +166,6 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 	limit_point.queue_free()
 	animProgLeft = Util.convert_to_real_coords(origin, Vector2(-1,0)).x
 	animProgRight = Util.convert_to_real_coords(origin, Vector2(200000,0)).x
-	functionLines = []
 	queue_redraw()
 	pause = false
 	animating = false
@@ -269,7 +268,6 @@ func animate_derivative(x: float):
 	target_point.free()
 	secant_line_left = Vector2.ZERO
 	secant_line_right = Vector2.ZERO
-	functionLines.clear()
 	queue_redraw()
 	
 func animate_Integral(type: String, left_bound: float, right_bound: float):
@@ -352,7 +350,6 @@ func animate_Integral(type: String, left_bound: float, right_bound: float):
 	animating = false
 	$AnimationControls.visible = false
 	area_display.free()
-	functionLines.clear()
 	
 func _on_play_pause_pressed() -> void:
 	pause = !pause

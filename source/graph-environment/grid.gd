@@ -8,6 +8,10 @@ var window_height :int = window_size.y
 @export var grid_spacing :int = 100
 @export var gridline_thickness :float = 1.0
 
+## Set by InputPanel before each animation. grid.gd uses this to draw the
+## user's expression instead of the hardcoded test function.
+var current_expr: String = ""
+
 var isDragging :bool = false
 var lastMousePos := Vector2.ZERO
 var origin := Vector2.ZERO
@@ -91,10 +95,9 @@ func _draw():
 	
 	queue_redraw()
 	
-	#Draw the function
-	draw_function(func(x):
-		return (x**2)
-	)
+	# Draw the user's function, or nothing if no expression has been entered yet.
+	if current_expr != "":
+		draw_function(func(x): return GiNaC.evaluate(current_expr, x))
 
 #controlls the moving of the "camera" when you click and drag
 func _input(event):
