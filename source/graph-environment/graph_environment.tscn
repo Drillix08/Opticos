@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://btgwfq06dppqf" path="res://grid.gd" id="1_17ijq"]
 [ext_resource type="Script" uid="uid://b6e8i5j8f21wn" path="res://animation_controls.gd" id="2_tlnqj"]
 [ext_resource type="Script" uid="uid://c2afb1qfcyypw" path="res://animator.gd" id="3_f04b4"]
+[ext_resource type="Script" uid="uid://bo464xjxofm6f" path="res://input_panel.gd" id="4_inputpanel"]
 
 [node name="Node2D" type="Node2D" unique_id=1181703709]
 
@@ -39,6 +40,12 @@ text = ">"
 [node name="Back" type="Button" parent="Control/Animator/AnimationControls" unique_id=1932808315]
 layout_mode = 2
 text = "<"
+
+[node name="InputPanel" type="Control" parent="Control" unique_id=1218166971]
+anchors_preset = 0
+script = ExtResource("4_inputpanel")
+
+[node name="NavigationObstacle2D" type="NavigationObstacle2D" parent="." unique_id=31551171]
 
 [connection signal="pressed" from="Control/Animator/AnimationControls/PlayPause" to="Control/Animator" method="_on_play_pause_pressed"]
 [connection signal="pressed" from="Control/Animator/AnimationControls/Next" to="Control/Animator" method="_on_next_pressed"]
