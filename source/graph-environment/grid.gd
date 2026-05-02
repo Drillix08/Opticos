@@ -121,17 +121,17 @@ func _input(event):
 		queue_redraw()
 	if event.is_action_pressed("zoom_in"):
 		print("scroll")
-	if event.is_action_pressed("ui_accept"):
-		$Animator.prepare_to_animate(functionValues, origin, grid_spacing, functionLines)
-		$Animator.animProgLeft = Util.convert_to_real_coords(origin, Vector2(0,0)).x
-		$Animator.animate_Limit(400, functionValues, true, true, .005, 1)
-	if Input.is_key_pressed(KEY_D):
-		$Animator.prepare_to_animate(functionValues, origin, grid_spacing, functionLines)
-		$Animator.animate_derivative(1)
-	if Input.is_key_pressed(KEY_I):
-		$Animator.prepare_to_animate(functionValues, origin, grid_spacing, functionLines)
-		# LEFT, RIGHT
-		$Animator.animate_Integral("LEFT", 0, 2)
+	#if event.is_action_pressed("ui_accept"):
+		#$Animator.prepare_to_animate(functionValues, origin, grid_spacing, functionLines)
+		#$Animator.animProgLeft = Util.convert_to_real_coords(origin, Vector2(0,0)).x
+		#$Animator.animate_Limit(400, functionValues, true, true, .005, 1)
+	#if Input.is_key_pressed(KEY_D):
+		#$Animator.prepare_to_animate(functionValues, origin, grid_spacing, functionLines)
+		#$Animator.animate_derivative(1)
+	#if Input.is_key_pressed(KEY_I):
+		#$Animator.prepare_to_animate(functionValues, origin, grid_spacing, functionLines)
+		## LEFT, RIGHT
+		#$Animator.animate_Integral("LEFT", 0, 2)
 ## This function will draw the graph of the function specified by input_function
 ## The argument of this function should be a function that takes a single argument x and returns y
 func draw_function(input_function: Callable):

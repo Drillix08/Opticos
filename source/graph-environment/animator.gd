@@ -268,6 +268,7 @@ func animate_derivative(x: float):
 	target_point.free()
 	secant_line_left = Vector2.ZERO
 	secant_line_right = Vector2.ZERO
+	functionLines.clear()
 	queue_redraw()
 	
 func animate_Integral(type: String, left_bound: float, right_bound: float):
@@ -349,6 +350,7 @@ func animate_Integral(type: String, left_bound: float, right_bound: float):
 	pause = false
 	animating = false
 	$AnimationControls.visible = false
+	functionLines.clear()
 	area_display.free()
 	
 func _on_play_pause_pressed() -> void:

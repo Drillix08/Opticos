@@ -52,7 +52,7 @@ func _ready() -> void:
 	_animator = get_parent().get_node_or_null("Animator")
 	if _animator == null:
 		push_error("InputPanel: could not find sibling node 'Animator'. " +
-		           "Make sure InputPanel is a child of the same node as Animator.")
+				   "Make sure InputPanel is a child of the same node as Animator.")
 
 	# Anchor to top-left and set a fixed width; height expands with content.
 	set_anchors_preset(Control.PRESET_TOP_LEFT)
@@ -289,7 +289,7 @@ func _on_animate_pressed() -> void:
 	var probe: float = GiNaC.evaluate(expr, 1.0)
 	if is_nan(probe) or is_inf(probe):
 		push_warning("InputPanel: f(1) is NaN/Inf — the expression may be " +
-		             "undefined at some points, but animation will proceed.")
+					 "undefined at some points, but animation will proceed.")
 
 	# ── validate type-specific fields ─────────────────────────────────────────
 	match _current_type:
@@ -378,7 +378,7 @@ func _build_function_data(expr: String) -> Dictionary:
 	# as public `var` in grid.gd so they are accessible directly.
 	if not "origin" in grid_node or not "grid_spacing" in grid_node:
 		_show_error("Could not read 'origin' / 'grid_spacing' from the grid node. " +
-		            "Check that grid.gd exposes these as public variables.")
+					"Check that grid.gd exposes these as public variables.")
 		return {}
 
 	var origin: Vector2   = grid_node.origin
