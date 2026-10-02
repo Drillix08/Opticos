@@ -1,5 +1,5 @@
 extends Control
-const Util = preload("res://Util/Util.gd")
+const Util = preload("res://src/util.gd")
 
 signal do_something(something: int)
 signal leftProg(n: int)
@@ -82,7 +82,7 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 	for coords in points:
 		if coords.x == endpoint:
 			limit_point = TextureRect.new()
-			limit_point.texture = load("res://Black_Circle.png")
+			limit_point.texture = load("res://assets/graph_environment/black_circle.png")
 			limit_point.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			limit_point.size = Vector2(20, 20)
 			limit_point.position = coords - Vector2(10, 10)
@@ -96,7 +96,7 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 	if(left): 
 		rect = TextureRect.new()
 		rect.position = Vector2(0,0)
-		rect.texture = load("res://Yellow_Circle.png")
+		rect.texture = load("res://assets/graph_environment/yellow_circle.png")
 		rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		rect.size = Vector2(10, 10)
 		add_child(rect)
@@ -191,7 +191,7 @@ func animate_derivative(x: float):
 		if Util.convert_to_real_coords(origin, point)[0] == x:
 			target = Util.convert_to_real_coords(origin, point)/grid_spacing
 			#drawing a point at the target derivative location
-			target_point.texture = load("res://Solid_Black_Circle.png")
+			target_point.texture = load("res://assets/graph_environment/solid_black_circle.png")
 			target_point.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			target_point.size = Vector2(10, 10)
 			target_point.position = point - Vector2(5, 5)

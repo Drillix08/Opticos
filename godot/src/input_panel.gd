@@ -283,13 +283,7 @@ func _on_animate_pressed() -> void:
 		_show_error("Please enter an expression.")
 		return
 
-	# Quick sanity-check: evaluate at x = 1.  GiNaC will crash Godot on a
-	# parse error, so we rely on the user writing valid syntax.  A future
-	# improvement would be a C++-side try/catch exposed via GDExtension.
-	var probe: float = GiNaC.evaluate(expr, 1.0)
-	if is_nan(probe) or is_inf(probe):
-		push_warning("InputPanel: f(1) is NaN/Inf — the expression may be " +
-					 "undefined at some points, but animation will proceed.")
+	# TODO: Validate `expr` using MathCore.
 
 	# ── validate type-specific fields ─────────────────────────────────────────
 	match _current_type:
@@ -395,8 +389,8 @@ func _build_function_data(expr: String) -> Dictionary:
 		var real_coords: Vector2 = Util.convert_to_real_coords(origin, Vector2(px, 0))
 		var real_x: float = real_coords.x / float(grid_spacing)
 
-		# Evaluate f(real_x).
-		var real_y: float = GiNaC.evaluate(expr, real_x)
+		# TODO: Evaluate f(real_x) using MathCore.
+		var real_y: float = 0.0
 
 		# Guard against NaN / Inf so we don't insert garbage into the array.
 		if is_nan(real_y) or is_inf(real_y):

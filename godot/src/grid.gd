@@ -1,5 +1,5 @@
 extends Control
-const Util = preload("res://Util/Util.gd")
+const Util = preload("res://src/util.gd")
 
 @export var window_size :Vector2i = DisplayServer.window_get_size()
 var window_width :int = window_size.x
@@ -97,7 +97,9 @@ func _draw():
 	
 	# Draw the user's function, or nothing if no expression has been entered yet.
 	if current_expr != "":
-		draw_function(func(x): return GiNaC.evaluate(current_expr, x))
+		# TODO: Call `draw_function()` with a lambda that uses MathCore to
+		# evaluate `curr_expr` at `x`
+		pass
 
 #controlls the moving of the "camera" when you click and drag
 func _input(event):
