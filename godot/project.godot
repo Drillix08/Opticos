@@ -14,7 +14,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 [application]
 
-config/name="graph_environment"
+config/name="Opticos"
 run/main_scene="uid://dlgeh0w3vomer"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
