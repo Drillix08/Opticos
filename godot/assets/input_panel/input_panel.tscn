@@ -1,6 +1,8 @@
-[gd_scene format=3 uid="uid://input_panel_scene"]
+[gd_scene format=3 uid="uid://b5cjqjhac3m0y"]
 
-[ext_resource type="Script" path="res://input_panel.gd" id="1_inputpanel"]
+[ext_resource type="Script" uid="uid://bo464xjxofm6f" path="res://src/input_panel.gd" id="1_inputpanel"]
 
-[node name="InputPanel" type="Control"]
+[node name="InputPanel" type="Control" unique_id=318089336]
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("1_inputpanel")

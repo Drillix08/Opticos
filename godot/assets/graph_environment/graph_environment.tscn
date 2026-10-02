@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://dlgeh0w3vomer"]
 
-[ext_resource type="Script" uid="uid://btgwfq06dppqf" path="res://grid.gd" id="1_17ijq"]
-[ext_resource type="Script" uid="uid://b6e8i5j8f21wn" path="res://animation_controls.gd" id="2_tlnqj"]
-[ext_resource type="Script" uid="uid://c2afb1qfcyypw" path="res://animator.gd" id="3_f04b4"]
-[ext_resource type="Script" uid="uid://bo464xjxofm6f" path="res://input_panel.gd" id="4_inputpanel"]
+[ext_resource type="Script" uid="uid://btgwfq06dppqf" path="res://src/grid.gd" id="1_17ijq"]
+[ext_resource type="Script" uid="uid://b6e8i5j8f21wn" path="res://src/animation_controls.gd" id="2_tlnqj"]
+[ext_resource type="Script" uid="uid://c2afb1qfcyypw" path="res://src/animator.gd" id="3_f04b4"]
+[ext_resource type="Script" uid="uid://bo464xjxofm6f" path="res://src/input_panel.gd" id="4_inputpanel"]
 
 [node name="Node2D" type="Node2D" unique_id=1181703709]
 
