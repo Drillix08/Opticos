@@ -1,5 +1,5 @@
 extends Control
-const Util = preload("res://Util/Util.gd")
+const Util = preload("res://src/util.gd")
 
 signal do_something(something: int)
 signal leftProg(n: int)
