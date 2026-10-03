@@ -283,7 +283,11 @@ func _on_animate_pressed() -> void:
 		_show_error("Please enter an expression.")
 		return
 
-	# TODO: Validate `expr` using MathCore.
+	# Quick sanity-check: evaluate at x = 1.
+	var probe: float = MathCore.evaluate_with_vars(expr, {"x": 1})
+	if is_nan(probe) or is_inf(probe):
+		push_warning("InputPanel: f(1) is NaN/Inf. The expression may be " +
+					 "undefined at some points, but animation will proceed.")
 
 	# ── validate type-specific fields ─────────────────────────────────────────
 	match _current_type:
@@ -389,8 +393,8 @@ func _build_function_data(expr: String) -> Dictionary:
 		var real_coords: Vector2 = Util.convert_to_real_coords(origin, Vector2(px, 0))
 		var real_x: float = real_coords.x / float(grid_spacing)
 
-		# TODO: Evaluate f(real_x) using MathCore.
-		var real_y: float = 0.0
+		# Evaluate f(real_x).
+		var real_y: float = MathCore.evaluate_with_vars(expr, {"x": real_x})
 
 		# Guard against NaN / Inf so we don't insert garbage into the array.
 		if is_nan(real_y) or is_inf(real_y):
