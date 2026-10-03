@@ -8,6 +8,11 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  RUST_DIR: rust
+
+defaults:
+  run:
+    working-directory: ${{ env.RUST_DIR }}
 
 jobs:
   build:
@@ -64,5 +69,5 @@ jobs:
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
-        files: lcov.info
+        files: ${{ env.RUST_DIR }}/lcov.info
         fail_ci_if_error: false
