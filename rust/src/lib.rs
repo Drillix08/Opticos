@@ -1,5 +1,7 @@
 use godot::prelude::*;
 
+mod mathcore_wrapper;
+
 struct Opticos;
 
 #[gdextension]
