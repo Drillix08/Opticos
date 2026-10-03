@@ -22,6 +22,7 @@ config/icon="uid://dewmaj5jqumcl"
 [autoload]
 
 Util="*uid://dl55omom00o6p"
+MathCore="*uid://cfbuvkiwvlw44"
 
 [display]
 
