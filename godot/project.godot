@@ -18,7 +18,6 @@ config/name="Opticos"
 run/main_scene="uid://dlgeh0w3vomer"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="uid://dewmaj5jqumcl"
-config/windows_native_icon="res://assets/opticos_logo/opticos_logo.ico"
 
 [autoload]
 

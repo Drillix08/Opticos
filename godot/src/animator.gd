@@ -105,7 +105,7 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 	if(right):
 		rect2 = TextureRect.new()
 		rect2.position = Vector2(0,0)
-		rect2.texture = load("res://Yellow_Circle.png")
+		rect2.texture = load("res://assets/graph_environment/yellow_circle.png")
 		rect2.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		rect2.size = Vector2(10, 10)
 		add_child(rect2)
@@ -210,7 +210,7 @@ func animate_derivative(x: float):
 	var i: int = len(functionValues)-1
 	
 	var rect = TextureRect.new()
-	rect.texture = load("res://Yellow_Circle.png")
+	rect.texture = load("res://assets/graph_environment/yellow_circle.png")
 	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	rect.size = Vector2(10, 10)
 	add_child(rect)		
