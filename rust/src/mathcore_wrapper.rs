@@ -4,9 +4,16 @@ use godot::prelude::*;
 use mathcore::{MathCore, MathError};
 
 #[derive(GodotClass)]
-#[class(init, base=Object)]
+#[class(base=Object)]
 pub struct MathCoreWrapper {
     base: Base<Object>,
+}
+
+#[godot_api]
+impl IObject for MathCoreWrapper {
+    fn init(base: Base<Object>) -> Self {
+        Self { base }
+    }
 }
 
 #[godot_api]
