@@ -19,6 +19,12 @@ var origin := Vector2.ZERO
 var functionValues: Array[Vector2] = [Vector2(-1, -1)]
 var functionLines: Array[Array]
 
+var gridColor = Color(0.5, 0.5, 0.5)
+var tickColor = Color(0, 0, 0, 1.0)
+var axisColor = Color(0, 0, 0, 1.0)
+
+var lineColor = Color.YELLOW
+
 '''
 If the x or y value of the origin has a distance
 that's greater then the grid spacing
@@ -42,19 +48,18 @@ func refresh_pixel_positions(xOffset, yOffset):
 func _draw():
 	#Draw the vertical lines of the grid
 	for x in range(0, 2*(int(window_size.x)), grid_spacing):
-		var color = Color(0.5, 0.5, 0.5)
 		#offset values the pixel positions of the graph objects
 		#have from their original positions when the origin was at initialization
 		var refreshedPosition :Array = refresh_pixel_positions(origin.x, origin.y)
 		var xOffset :float = refreshedPosition[0]
 		var yOffset :float = refreshedPosition[1]
 		#draw vertical gridline
-		draw_line(Vector2(x+xOffset, yOffset-grid_spacing), Vector2(x+xOffset, 2*window_size.y+yOffset-grid_spacing), color, gridline_thickness)
+		draw_line(Vector2(x+xOffset, yOffset-grid_spacing), Vector2(x+xOffset, 2*window_size.y+yOffset-grid_spacing), gridColor, gridline_thickness)
 		#draw an x-axis tick
 		@warning_ignore("integer_division")
 		var xTickPos = window_height/2
 		@warning_ignore("integer_division")
-		draw_line(Vector2(x+xOffset, xTickPos-grid_spacing/5+origin.y), Vector2(x+xOffset, xTickPos+grid_spacing/5+origin.y), Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
+		draw_line(Vector2(x+xOffset, xTickPos-grid_spacing/5+origin.y), Vector2(x+xOffset, xTickPos+grid_spacing/5+origin.y), tickColor, 5*gridline_thickness)
 		#draw the number label above the x-axis tick
 		var text_width = 25
 		@warning_ignore("integer_division")
@@ -65,19 +70,18 @@ func _draw():
 		if(text_to_draw != "0"): draw_string(ThemeDB.fallback_font, draw_position, text_to_draw, HORIZONTAL_ALIGNMENT_LEFT, 100, text_width, text_color)
 	#Draw the horizontal lines of the grid
 	for y in range(0, 2*(int(window_size.y)), grid_spacing):
-		var color = Color(0.5, 0.5, 0.5)
 		#offset values the pixel positions of the graph objects
 		#have from their original positions when the origin was at initialization
 		var refreshedPosition :Array = refresh_pixel_positions(origin.x, origin.y)
 		var xOffset :float = refreshedPosition[0]
 		var yOffset :float = refreshedPosition[1]
 		#Draw horizontal gridline
-		draw_line(Vector2(xOffset-grid_spacing, y+yOffset), Vector2(2*window_size.x+xOffset-grid_spacing, y+yOffset), color, gridline_thickness)
+		draw_line(Vector2(xOffset-grid_spacing, y+yOffset), Vector2(2*window_size.x+xOffset-grid_spacing, y+yOffset), gridColor, gridline_thickness)
 		#draw a y-axis tick
 		@warning_ignore("integer_division")
 		var yTickPos = window_width/2
 		@warning_ignore("integer_division")
-		draw_line(Vector2(yTickPos-grid_spacing/5+origin.x, y+yOffset), Vector2(yTickPos+grid_spacing/5+origin.x, y+yOffset), Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
+		draw_line(Vector2(yTickPos-grid_spacing/5+origin.x, y+yOffset), Vector2(yTickPos+grid_spacing/5+origin.x, y+yOffset), tickColor, 5*gridline_thickness)
 		#draw the number label above the y-axis tick
 		var text_width = 25
 		@warning_ignore("integer_division")
@@ -88,10 +92,10 @@ func _draw():
 		draw_string(ThemeDB.fallback_font, draw_position, text_to_draw, HORIZONTAL_ALIGNMENT_LEFT, 100, text_width, text_color)
 	#Draw x-axis
 	@warning_ignore("integer_division")
-	draw_line(Vector2(-origin.x, window_height/2) + origin, Vector2(window_width-origin.x, window_height/2) + origin, Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
+	draw_line(Vector2(-origin.x, window_height/2) + origin, Vector2(window_width-origin.x, window_height/2) + origin, axisColor, 5*gridline_thickness)
 	#draw y-axis
 	@warning_ignore("integer_division")
-	draw_line(Vector2(window_width/2, -origin.y) + origin, Vector2(window_width/2, window_height-origin.y) + origin, Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
+	draw_line(Vector2(window_width/2, -origin.y) + origin, Vector2(window_width/2, window_height-origin.y) + origin, axisColor, 5*gridline_thickness)
 	
 	queue_redraw()
 	

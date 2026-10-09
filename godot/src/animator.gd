@@ -8,6 +8,9 @@ var animating: bool = false
 var stepSize: int = 1
 var moveDirection
 
+var lineColor = Color.YELLOW
+var functionColor = Color.RED
+
 var window_size :Vector2i = DisplayServer.window_get_size()
 var window_width :int = window_size.x
 var window_height :int = window_size.y 
@@ -39,15 +42,15 @@ func _ready() -> void:
 	
 	
 func _draw() -> void:
-	draw_line(secant_line_left, secant_line_right, Color.YELLOW)
+	draw_line(secant_line_left, secant_line_right, lineColor)
 	for rectangle in rectangles: 
-		draw_rect(rectangle, Color.YELLOW) 
+		draw_rect(rectangle, lineColor) 
 		if rectangle.size[0] > 1: # do not draw the border on the final iteration
 			draw_rect(rectangle, Color.BLACK, false, 1) # rectangle outline
 	# this if for drawing on top of integral
 	for line in functionLines:
-		if(line[0].x < animProgLeft || line[1].x > animProgRight): draw_line(line[0], line[1], Color.YELLOW, 2)
-		else: draw_line(line[0], line[1], Color.RED, 2)
+		if(line[0].x < animProgLeft || line[1].x > animProgRight): draw_line(line[0], line[1], lineColor, 2)
+		else: draw_line(line[0], line[1], functionColor, 2)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:

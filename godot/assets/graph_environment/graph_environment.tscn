@@ -23,7 +23,6 @@ offset_bottom = 40.0
 script = ExtResource("3_f04b4")
 
 [node name="AnimationControls" type="Container" parent="Control/Animator" unique_id=1486893199]
-visible = false
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 8.0

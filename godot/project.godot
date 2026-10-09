@@ -26,8 +26,8 @@ MathCore="*uid://cfbuvkiwvlw44"
 
 [display]
 
-window/size/viewport_width=1000
-window/size/viewport_height=800
+window/size/viewport_width=2400
+window/size/viewport_height=1400
 
 [input]
 
