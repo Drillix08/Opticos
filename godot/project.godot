@@ -29,6 +29,10 @@ MathCore="*uid://cfbuvkiwvlw44"
 window/size/viewport_width=1000
 window/size/viewport_height=800
 
+[dotnet]
+
+project/assembly_name="Opticos"
+
 [input]
 
 zoom_in={
