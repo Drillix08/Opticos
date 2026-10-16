@@ -5,20 +5,20 @@ using System;
 [Tool]
 public partial class GodoTeX : EditorPlugin {
 	public override void _EnterTree() {
-		var texture_grey = GD.Load<Texture2D>("addons/GodoTeX/iconGrey.svg");
-		var texture_script = GD.Load<Script>("addons/GodoTeX/LaTeXture.cs");
+		var texture_grey = GD.Load<Texture2D>("addons/godotex/iconGrey.svg");
+		var texture_script = GD.Load<Script>("addons/godotex/LaTeXture.cs");
 		AddCustomType("LaTeXture", "ImageTexture", texture_script, texture_grey);
 		
-		var texture_red = GD.Load<Texture2D>("addons/GodoTeX/iconRed.svg");
-		var spatial_script = GD.Load<Script>("addons/GodoTeX/LaTeX3D.cs");
+		var texture_red = GD.Load<Texture2D>("addons/godotex/iconRed.svg");
+		var spatial_script = GD.Load<Script>("addons/godotex/LaTeX3D.cs");
 		AddCustomType("LaTeX3D", "Sprite3D", spatial_script, texture_red);
 		
-		var texture = GD.Load<Texture2D>("addons/GodoTeX/icon.svg");
-		var script = GD.Load<Script>("addons/GodoTeX/LaTeX2D.cs");
+		var texture = GD.Load<Texture2D>("addons/godotex/icon.svg");
+		var script = GD.Load<Script>("addons/godotex/LaTeX2D.cs");
 		AddCustomType("LaTeX2D", "Sprite2D", script, texture);
 		
-		var texture_button = GD.Load<Texture2D>("addons/GodoTeX/iconButton.svg");
-		var button_script = GD.Load<Script>("addons/GodoTeX/LaTeXButton.cs");
+		var texture_button = GD.Load<Texture2D>("addons/godotex/iconButton.svg");
+		var button_script = GD.Load<Script>("addons/godotex/LaTeXButton.cs");
 		AddCustomType("LaTeXButton", "TextureButton", button_script, texture_button);
 	}
 
