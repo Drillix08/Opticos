@@ -16,7 +16,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 config/name="Opticos"
 run/main_scene="uid://dlgeh0w3vomer"
-config/features=PackedStringArray("4.7", "Forward Plus")
+config/features=PackedStringArray("4.7", "C#", "Forward Plus")
 config/icon="uid://dewmaj5jqumcl"
 
 [autoload]
@@ -32,6 +32,10 @@ window/size/viewport_height=800
 [dotnet]
 
 project/assembly_name="Opticos"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godotex/plugin.cfg")
 
 [input]
 
