@@ -23,8 +23,6 @@ var gridColor = Color(0.5, 0.5, 0.5)
 var tickColor = Color(0, 0, 0, 1.0)
 var axisColor = Color(0, 0, 0, 1.0)
 
-var lineColor = Color.YELLOW
-
 '''
 If the x or y value of the origin has a distance
 that's greater then the grid spacing
