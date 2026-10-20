@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://eplu7tu8wr4"]
+
+[ext_resource type="Script" uid="uid://d03tea1uegfg0" path="res://assets/title_screen/2d_graph_button.gd" id="1_ymcl0"]
+
+[node name="TitleScreen" type="Node2D" unique_id=409708784]
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1625802869]
+offset_right = 2400.0
+offset_bottom = 1400.0
+color = Color(0.2520276, 0.25202766, 0.25202763, 1)
+
+[node name="Title" type="Label" parent="ColorRect" unique_id=727189531]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 60.0
+offset_right = 551.0
+offset_bottom = 235.0
+theme_override_font_sizes/font_size = 128
+text = "Opticos"
+
+[node name="2dGraphButton" type="Button" parent="ColorRect" unique_id=559507081]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 300.0
+offset_right = 440.0
+offset_bottom = 460.0
+theme_override_font_sizes/font_size = 48
+text = "2D Graph
+Environment"
+script = ExtResource("1_ymcl0")
+
+[node name="3dGraphButton" type="Button" parent="ColorRect" unique_id=1950508969]
+layout_mode = 0
+offset_left = 500.0
+offset_top = 300.0
+offset_right = 860.0
+offset_bottom = 460.0
+theme_override_font_sizes/font_size = 48
+text = "3D Graph
+Environment"
+
+[connection signal="pressed" from="ColorRect/2dGraphButton" to="ColorRect/2dGraphButton" method="_on_pressed"]
