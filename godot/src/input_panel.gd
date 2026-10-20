@@ -43,7 +43,6 @@ enum AnimType { LIMIT, DERIVATIVE, INTEGRAL }
 var _current_type: AnimType = AnimType.LIMIT
 
 const _PANEL_WIDTH:  int = 300
-const _PANEL_MARGIN: int = 12
 
 # ── lifecycle ─────────────────────────────────────────────────────────────────
 
@@ -56,7 +55,7 @@ func _ready() -> void:
 
 	# Anchor to top-left and set a fixed width; height expands with content.
 	set_anchors_preset(Control.PRESET_TOP_LEFT)
-	position = Vector2(_PANEL_MARGIN, _PANEL_MARGIN)
+	position = Vector2(Util.PANEL_SCREEN_MARGIN, Util.PANEL_SCREEN_MARGIN)
 	size     = Vector2(_PANEL_WIDTH, 0)
 
 	_build_ui()
@@ -72,14 +71,14 @@ func _build_ui() -> void:
 	add_child(panel)
 
 	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left",   12)
-	margin.add_theme_constant_override("margin_right",  12)
-	margin.add_theme_constant_override("margin_top",    12)
-	margin.add_theme_constant_override("margin_bottom", 12)
+	margin.add_theme_constant_override("margin_left",   Util.PANEL_PADDING)
+	margin.add_theme_constant_override("margin_right",  Util.PANEL_PADDING)
+	margin.add_theme_constant_override("margin_top",    Util.PANEL_PADDING)
+	margin.add_theme_constant_override("margin_bottom", Util.PANEL_PADDING)
 	panel.add_child(margin)
 
 	var vbox := VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 8)
+	vbox.add_theme_constant_override("separation", Util.PANEL_ROW_SEPARATION)
 	margin.add_child(vbox)
 
 	# ── Title ────────────────────────────────────────────────────────────────

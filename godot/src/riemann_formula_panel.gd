@@ -1,18 +1,45 @@
 class_name RiemannFormulaPanel
 extends PanelContainer
 
-const SCREEN_MARGIN: float = 12.0
+const LATEXTURE_PATH: String = "res://addons/godotex/LaTeXture.cs"
 
 @export var font_size: float = 24.0
 @export var text_color := Color.WHITE
 
+
 var _latexture_script: Script
+var _formula_rect: TextureRect
 var _placed: bool = false
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	_latexture_script = load(LATEXTURE_PATH)
+	assert(_latexture_script != null)
+
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.1, 0.1, 0.1, 0.95)
+	style.set_corner_radius_all(8)
+	style.set_border_width_all(1)
+	style.border_color = Color(1, 1, 1, 0.25)
+	add_theme_stylebox_override("panel", style)
+
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	mouse_default_cursor_shape = Control.CURSOR_MOVE
+
+	var margin := MarginContainer.new()
+	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for side in ["left", "right", "top", "bottom"]:
+		margin.add_theme_constant_override("margin_" + side, Util.PANEL_PADDING)
+	add_child(margin)
+
+	var vbox := VBoxContainer.new()
+	vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vbox.add_theme_constant_override("separation", Util.PANEL_ROW_SEPARATION)
+	margin.add_child(vbox)
+
+	_formula_rect = _make_latex_rect()
+	vbox.add_child(_formula_rect)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -31,15 +58,15 @@ func _set_latex(rect: TextureRect, latex: String, previous: String) -> void:
 	if latex == previous and rect.texture != null:
 		 # nothing changed, skip the (relatively slow) re-render
 		return
-		
+
 	if _latexture_script == null:
 		return
-		
+
 	var renderer = _latexture_script.new()
 	renderer.LatexExpression = latex
 	renderer.FontSize = font_size
 	renderer.MathColor = text_color
-	
+
 	rect.texture = renderer.Render()
 
 
@@ -47,7 +74,7 @@ func _refit() -> void:
 	reset_size()
 	if not _placed:
 		var min_size: Vector2 = get_combined_minimum_size()
-		position = Vector2(get_viewport_rect().size.x - min_size.x - SCREEN_MARGIN, SCREEN_MARGIN)
+		position = Vector2(get_viewport_rect().size.x - min_size.x - Util.PANEL_SCREEN_MARGIN, Util.PANEL_SCREEN_MARGIN)
 		_placed = true
 	_clamp_to_viewport()
 
