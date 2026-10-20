@@ -1,6 +1,10 @@
 class_name RiemannFormulaPanel
 extends PanelContainer
 
+const SCREEN_MARGIN: float = 12.0
+
+var _placed: bool = false
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -10,6 +14,15 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
+
+
+func _refit() -> void:
+	reset_size()
+	if not _placed:
+		var min_size: Vector2 = get_combined_minimum_size()
+		position = Vector2(get_viewport_rect().size.x - min_size.x - SCREEN_MARGIN, SCREEN_MARGIN)
+		_placed = true
+	_clamp_to_viewport()
 
 
 func _clamp_to_viewport() -> void:
