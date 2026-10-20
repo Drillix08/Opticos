@@ -16,6 +16,13 @@ func _process(delta: float) -> void:
 	pass
 
 
+func _make_latex_rect() -> TextureRect:
+	var rect := TextureRect.new()
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	rect.stretch_mode = TextureRect.STRETCH_KEEP
+	return rect
+
+
 func _refit() -> void:
 	reset_size()
 	if not _placed:
