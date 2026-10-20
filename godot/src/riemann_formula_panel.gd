@@ -3,6 +3,10 @@ extends PanelContainer
 
 const SCREEN_MARGIN: float = 12.0
 
+@export var font_size: float = 24.0
+@export var text_color := Color.WHITE
+
+var _latexture_script: Script
 var _placed: bool = false
 
 
@@ -21,6 +25,22 @@ func _make_latex_rect() -> TextureRect:
 	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	rect.stretch_mode = TextureRect.STRETCH_KEEP
 	return rect
+
+
+func _set_latex(rect: TextureRect, latex: String, previous: String) -> void:
+	if latex == previous and rect.texture != null:
+		 # nothing changed, skip the (relatively slow) re-render
+		return
+		
+	if _latexture_script == null:
+		return
+		
+	var renderer = _latexture_script.new()
+	renderer.LatexExpression = latex
+	renderer.FontSize = font_size
+	renderer.MathColor = text_color
+	
+	rect.texture = renderer.Render()
 
 
 func _refit() -> void:
