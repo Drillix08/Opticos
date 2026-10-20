@@ -6,10 +6,11 @@ const LATEXTURE_PATH: String = "res://addons/godotex/LaTeXture.cs"
 @export var font_size: float = 24.0
 @export var text_color := Color.WHITE
 
-
 var _latexture_script: Script
 var _formula_rect: TextureRect
 var _placed: bool = false
+var _dragging: bool = false
+var _drag_offset := Vector2.ZERO
 
 
 # Called when the node enters the scene tree for the first time.
@@ -45,6 +46,17 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
+
+
+func _gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		_dragging = event.pressed
+		_drag_offset = get_global_mouse_position() - global_position
+		accept_event()
+	elif event is InputEventMouseMotion and _dragging:
+		global_position = get_global_mouse_position() - _drag_offset
+		_clamp_to_viewport()
+		accept_event()
 
 
 func _make_latex_rect() -> TextureRect:
