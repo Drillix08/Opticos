@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://b6e8i5j8f21wn" path="res://src/animation_controls.gd" id="2_tlnqj"]
 [ext_resource type="Script" uid="uid://c2afb1qfcyypw" path="res://src/animator.gd" id="3_f04b4"]
 [ext_resource type="Script" uid="uid://bo464xjxofm6f" path="res://src/input_panel.gd" id="4_inputpanel"]
+[ext_resource type="Script" uid="uid://ba6iwvbeqlbvi" path="res://assets/graph_environment/color_panel.gd" id="5_juirp"]
 
 [node name="Node2D" type="Node2D" unique_id=1181703709]
 
@@ -23,7 +24,6 @@ offset_bottom = 40.0
 script = ExtResource("3_f04b4")
 
 [node name="AnimationControls" type="Container" parent="Control/Animator" unique_id=1486893199]
-visible = false
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 8.0
@@ -44,6 +44,12 @@ text = "<"
 [node name="InputPanel" type="Control" parent="Control" unique_id=1218166971]
 anchors_preset = 0
 script = ExtResource("4_inputpanel")
+
+[node name="ColorPanel" type="Control" parent="Control" unique_id=1680224254]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("5_juirp")
 
 [node name="NavigationObstacle2D" type="NavigationObstacle2D" parent="." unique_id=31551171]
 
