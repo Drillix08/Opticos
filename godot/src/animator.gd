@@ -284,6 +284,9 @@ func animate_Integral(type: String, left_bound: float, right_bound: float):
 	add_child(area_display)
 	area_display.text = "Area: 0"
 	
+	var riemann_formula_panel := RiemannFormulaPanel.new()
+	add_child(riemann_formula_panel)
+	
 	# initialize start and end to the left and right bound of the screen
 	var start: int = 1
 	var end: int = len(functionValues)-2
@@ -321,6 +324,11 @@ func animate_Integral(type: String, left_bound: float, right_bound: float):
 			var height: float = Util.convert_to_real_coords(origin, rect_position)[1]
 			var rect_size: Vector2 = Vector2(width, height)
 			rectangles.append(Rect2(rect_position, rect_size))
+
+		# Update the Riemann sum shown in the side panel
+		var is_last_frame: bool = currentRectangleCount * 2 > maxRectangleCount
+		riemann_formula_panel.show_riemann(rectangles.size(), type == "RIGHT", is_last_frame)
+
 		# calculate current area
 		var area = 0
 		for rectangle in rectangles:
@@ -352,6 +360,7 @@ func animate_Integral(type: String, left_bound: float, right_bound: float):
 	$AnimationControls.visible = false
 	functionLines.clear()
 	area_display.free()
+	riemann_formula_panel.queue_free()
 	
 func _on_play_pause_pressed() -> void:
 	pause = !pause
