@@ -2,12 +2,14 @@ class_name RiemannFormulaPanel
 extends PanelContainer
 
 const LATEXTURE_PATH: String = "res://addons/godotex/LaTeXture.cs"
+const SUMMAND: String = r"f(a + k \cdot \Delta x) \cdot \Delta x"
 
 @export var font_size: float = 24.0
 @export var text_color := Color.WHITE
 
 var _latexture_script: Script
 var _formula_rect: TextureRect
+var _definite_integral_definition: String = ""
 var _placed: bool = false
 var _dragging: bool = false
 var _drag_offset := Vector2.ZERO
@@ -57,6 +59,25 @@ func _gui_input(event: InputEvent) -> void:
 		global_position = get_global_mouse_position() - _drag_offset
 		_clamp_to_viewport()
 		accept_event()
+
+
+func show_riemann(n: int, is_right: bool, is_final: bool) -> void:
+	# Left Riemann sum: k = 0 .. n-1 samples the left edges
+	# Right Riemann sum: k = 1 .. n samples the right edges
+	var k_start: int = 1 if is_right else 0
+	var k_end: int = n if is_right else n - 1
+
+	var formula: String
+	if is_final:
+		var upper: String = "n" if is_right else "n - 1"
+		formula = r"\int_{a}^{b} f(x)\,dx = \lim_{n \rightarrow \infty} \sum_{k = %d}^{%s} %s" % [k_start, upper, SUMMAND]
+	else:
+		formula = r"A = \sum_{k = %d}^{%d} %s" % [k_start, k_end, SUMMAND]
+
+	_set_latex(_formula_rect, formula, _definite_integral_definition)
+	_definite_integral_definition = formula
+
+	_refit()
 
 
 func _make_latex_rect() -> TextureRect:
