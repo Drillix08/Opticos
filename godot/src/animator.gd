@@ -327,7 +327,7 @@ func animate_Integral(type: String, left_bound: float, right_bound: float):
 
 		# Update the Riemann sum shown in the side panel
 		var is_last_frame: bool = currentRectangleCount * 2 > maxRectangleCount
-		riemann_formula_panel.show_riemann(rectangles.size(), type == "RIGHT", is_last_frame)
+		riemann_formula_panel.show_riemann(rectangles.size(), float(increment) / grid_spacing, type == "RIGHT", is_last_frame)
 
 		# calculate current area
 		var area = 0

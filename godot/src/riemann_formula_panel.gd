@@ -8,8 +8,10 @@ const SUMMAND: String = r"f(a + k \cdot \Delta x) \cdot \Delta x"
 @export var text_color := Color.WHITE
 
 var _latexture_script: Script
-var _formula_rect: TextureRect
+var _riemann_formula_rect: TextureRect
+var _subinterval_width_rect: TextureRect
 var _definite_integral_definition: String = ""
+var _infinitesimal_width: String = ""
 var _placed: bool = false
 var _dragging: bool = false
 var _drag_offset := Vector2.ZERO
@@ -41,8 +43,10 @@ func _ready() -> void:
 	vbox.add_theme_constant_override("separation", Util.PANEL_ROW_SEPARATION)
 	margin.add_child(vbox)
 
-	_formula_rect = _make_latex_rect()
-	vbox.add_child(_formula_rect)
+	_riemann_formula_rect = _make_latex_rect()
+	vbox.add_child(_riemann_formula_rect)
+	_subinterval_width_rect = _make_latex_rect()
+	vbox.add_child(_subinterval_width_rect)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -61,21 +65,27 @@ func _gui_input(event: InputEvent) -> void:
 		accept_event()
 
 
-func show_riemann(n: int, is_right: bool, is_final: bool) -> void:
+func show_riemann(n: int, delta_x: float, is_right: bool, is_final: bool) -> void:
 	# Left Riemann sum: k = 0 .. n-1 samples the left edges
 	# Right Riemann sum: k = 1 .. n samples the right edges
 	var k_start: int = 1 if is_right else 0
 	var k_end: int = n if is_right else n - 1
 
-	var formula: String
+	var riemann_formula: String
+	var subinterval_width: String
+	
 	if is_final:
 		var upper: String = "n" if is_right else "n - 1"
-		formula = r"\int_{a}^{b} f(x)\,dx = \lim_{n \rightarrow \infty} \sum_{k = %d}^{%s} %s" % [k_start, upper, SUMMAND]
+		riemann_formula = r"\int_{a}^{b} f(x)\,dx = \lim_{n \rightarrow \infty} \sum_{k = %d}^{%s} %s" % [k_start, upper, SUMMAND]
+		subinterval_width = r"\Delta x = dx"
 	else:
-		formula = r"A = \sum_{k = %d}^{%d} %s" % [k_start, k_end, SUMMAND]
+		riemann_formula = r"A = \sum_{k = %d}^{%d} %s" % [k_start, k_end, SUMMAND]
+		subinterval_width = r"\Delta x = \frac{b - a}{%d} = %.3f" % [n, delta_x]
 
-	_set_latex(_formula_rect, formula, _definite_integral_definition)
-	_definite_integral_definition = formula
+	_set_latex(_riemann_formula_rect, riemann_formula, _definite_integral_definition)
+	_set_latex(_subinterval_width_rect, subinterval_width, _infinitesimal_width)
+	_definite_integral_definition = riemann_formula
+	_infinitesimal_width = subinterval_width
 
 	_refit()
 
