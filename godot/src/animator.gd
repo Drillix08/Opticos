@@ -342,7 +342,7 @@ func animate_Integral(type: String, left_bound: float, right_bound: float, expr:
 
 		# Update the Riemann sum shown in the side panel
 		var is_last_frame: bool = currentRectangleCount * 2 > maxRectangleCount
-		riemann_formula_panel.show_riemann(rectangles.size(), float(increment) / grid_spacing, riemann_sum, type == "RIGHT", is_last_frame, definite_integral)
+		riemann_formula_panel.show_riemann(rectangles.size(), right_bound - left_bound, riemann_sum, type == "RIGHT", is_last_frame, definite_integral)
 
 		queue_redraw()
 		if !pause:

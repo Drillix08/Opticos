@@ -65,7 +65,7 @@ func _gui_input(event: InputEvent) -> void:
 		accept_event()
 
 
-func show_riemann(n: int, delta_x: float, riemann_sum: float, is_right: bool, is_final: bool, definite_integral: float = NAN) -> void:
+func show_riemann(n: int, span: float, riemann_sum: float, is_right: bool, is_final: bool, definite_integral: float = NAN) -> void:
 	# Left Riemann sum: k = 0 .. n-1 samples the left edges
 	# Right Riemann sum: k = 1 .. n samples the right edges
 	var k_start: int = 1 if is_right else 0
@@ -84,7 +84,7 @@ func show_riemann(n: int, delta_x: float, riemann_sum: float, is_right: bool, is
 		subinterval_width = r"\Delta x = dx"
 	else:
 		riemann_formula = r"A = \sum_{k = %d}^{%d} %s = %.3f" % [k_start, k_end, SUMMAND, riemann_sum]
-		subinterval_width = r"\Delta x = \frac{b - a}{%d} = %.3f" % [n, delta_x]
+		subinterval_width = r"\Delta x = \frac{b - a}{%d} = \frac{%s}{%d}" % [n, ("%.3f" % span).rstrip("0").rstrip("."), n]
 
 	_set_latex(_riemann_formula_rect, riemann_formula, _definite_integral_definition)
 	_set_latex(_subinterval_width_rect, subinterval_width, _infinitesimal_width)
