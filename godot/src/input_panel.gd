@@ -357,7 +357,7 @@ func _on_animate_pressed() -> void:
 			var int_type: String = "LEFT" if _integral_type_opt.selected == 0 else "RIGHT"
 			var left_bound: float  = float(_integral_left_input.text)
 			var right_bound: float = float(_integral_right_input.text)
-			_animator.animate_Integral(int_type, left_bound, right_bound)
+			_animator.animate_Integral(int_type, left_bound, right_bound, expr)
 
 # ── helpers ───────────────────────────────────────────────────────────────────
 

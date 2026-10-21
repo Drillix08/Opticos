@@ -65,7 +65,7 @@ func _gui_input(event: InputEvent) -> void:
 		accept_event()
 
 
-func show_riemann(n: int, delta_x: float, riemann_sum: float, is_right: bool, is_final: bool) -> void:
+func show_riemann(n: int, delta_x: float, riemann_sum: float, is_right: bool, is_final: bool, definite_integral: float = NAN) -> void:
 	# Left Riemann sum: k = 0 .. n-1 samples the left edges
 	# Right Riemann sum: k = 1 .. n samples the right edges
 	var k_start: int = 1 if is_right else 0
@@ -77,6 +77,10 @@ func show_riemann(n: int, delta_x: float, riemann_sum: float, is_right: bool, is
 	if is_final:
 		var upper: String = "n" if is_right else "n - 1"
 		riemann_formula = r"\int_{a}^{b} f(x)\,dx = \lim_{n \rightarrow \infty} \sum_{k = %d}^{%s} %s" % [k_start, upper, SUMMAND]
+
+		if not is_nan(definite_integral):
+			riemann_formula += r" = %.3f" % definite_integral
+
 		subinterval_width = r"\Delta x = dx"
 	else:
 		riemann_formula = r"A = \sum_{k = %d}^{%d} %s = %.3f" % [k_start, k_end, SUMMAND, riemann_sum]

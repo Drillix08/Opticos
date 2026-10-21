@@ -271,7 +271,7 @@ func animate_derivative(x: float):
 	functionLines.clear()
 	queue_redraw()
 	
-func animate_Integral(type: String, left_bound: float, right_bound: float):
+func animate_Integral(type: String, left_bound: float, right_bound: float, expr: String):
 	if type not in ["LEFT", "RIGHT"]:
 		print("Invalid argument")
 		return
@@ -286,7 +286,11 @@ func animate_Integral(type: String, left_bound: float, right_bound: float):
 	
 	var riemann_formula_panel := RiemannFormulaPanel.new()
 	add_child(riemann_formula_panel)
-	
+
+	var definite_integral: float = NAN
+	if expr != "":
+		definite_integral = MathCoreWrapper.numerical_integrate(expr, "x", left_bound, right_bound)
+
 	# initialize start and end to the left and right bound of the screen
 	var start: int = 1
 	var end: int = len(functionValues)-2
@@ -338,7 +342,7 @@ func animate_Integral(type: String, left_bound: float, right_bound: float):
 
 		# Update the Riemann sum shown in the side panel
 		var is_last_frame: bool = currentRectangleCount * 2 > maxRectangleCount
-		riemann_formula_panel.show_riemann(rectangles.size(), float(increment) / grid_spacing, riemann_sum, type == "RIGHT", is_last_frame)
+		riemann_formula_panel.show_riemann(rectangles.size(), float(increment) / grid_spacing, riemann_sum, type == "RIGHT", is_last_frame, definite_integral)
 
 		queue_redraw()
 		if !pause:
