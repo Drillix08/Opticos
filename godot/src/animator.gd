@@ -325,18 +325,21 @@ func animate_Integral(type: String, left_bound: float, right_bound: float):
 			var rect_size: Vector2 = Vector2(width, height)
 			rectangles.append(Rect2(rect_position, rect_size))
 
-		# Update the Riemann sum shown in the side panel
-		var is_last_frame: bool = currentRectangleCount * 2 > maxRectangleCount
-		riemann_formula_panel.show_riemann(rectangles.size(), float(increment) / grid_spacing, type == "RIGHT", is_last_frame)
-
 		# calculate current area
 		var area = 0
+		var riemann_sum: float = 0.0
 		for rectangle in rectangles:
+			riemann_sum += rectangle.get_area() / (grid_spacing**2)
 			if rectangle.size[1] > 0:
 				area += rectangle.get_area() / (grid_spacing**2)
 			else:
 				area -= rectangle.get_area() / (grid_spacing**2)
 		area_display.text = "Area: %.3f" % area
+
+		# Update the Riemann sum shown in the side panel
+		var is_last_frame: bool = currentRectangleCount * 2 > maxRectangleCount
+		riemann_formula_panel.show_riemann(rectangles.size(), float(increment) / grid_spacing, riemann_sum, type == "RIGHT", is_last_frame)
+
 		queue_redraw()
 		if !pause:
 			await get_tree().create_timer(speed).timeout
