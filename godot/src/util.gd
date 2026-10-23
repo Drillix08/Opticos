@@ -1,5 +1,8 @@
 extends Node
 
+const PANEL_PADDING: int = 12
+const PANEL_SCREEN_MARGIN: int = 12
+const PANEL_ROW_SEPARATION: int = 8
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

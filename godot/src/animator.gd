@@ -274,7 +274,7 @@ func animate_derivative(x: float):
 	functionLines.clear()
 	queue_redraw()
 	
-func animate_Integral(type: String, left_bound: float, right_bound: float):
+func animate_Integral(type: String, left_bound: float, right_bound: float, expr: String):
 	if type not in ["LEFT", "RIGHT"]:
 		print("Invalid argument")
 		return
@@ -287,6 +287,13 @@ func animate_Integral(type: String, left_bound: float, right_bound: float):
 	add_child(area_display)
 	area_display.text = "Area: 0"
 	
+	var riemann_formula_panel := RiemannFormulaPanel.new()
+	add_child(riemann_formula_panel)
+
+	var definite_integral: float = NAN
+	if expr != "":
+		definite_integral = MathCoreWrapper.numerical_integrate(expr, "x", left_bound, right_bound)
+
 	# initialize start and end to the left and right bound of the screen
 	var start: int = 1
 	var end: int = len(functionValues)-2
@@ -324,14 +331,22 @@ func animate_Integral(type: String, left_bound: float, right_bound: float):
 			var height: float = Util.convert_to_real_coords(origin, rect_position)[1]
 			var rect_size: Vector2 = Vector2(width, height)
 			rectangles.append(Rect2(rect_position, rect_size))
+
 		# calculate current area
 		var area = 0
+		var riemann_sum: float = 0.0
 		for rectangle in rectangles:
+			riemann_sum += rectangle.get_area() / (grid_spacing**2)
 			if rectangle.size[1] > 0:
 				area += rectangle.get_area() / (grid_spacing**2)
 			else:
 				area -= rectangle.get_area() / (grid_spacing**2)
 		area_display.text = "Area: %.3f" % area
+
+		# Update the Riemann sum shown in the side panel
+		var is_last_frame: bool = currentRectangleCount * 2 > maxRectangleCount
+		riemann_formula_panel.show_riemann(rectangles.size(), right_bound - left_bound, riemann_sum, type == "RIGHT", is_last_frame, definite_integral)
+
 		queue_redraw()
 		if !pause:
 			await get_tree().create_timer(speed).timeout
@@ -355,6 +370,7 @@ func animate_Integral(type: String, left_bound: float, right_bound: float):
 	$AnimationControls.visible = false
 	functionLines.clear()
 	area_display.free()
+	riemann_formula_panel.queue_free()
 	
 func _on_play_pause_pressed() -> void:
 	pause = !pause

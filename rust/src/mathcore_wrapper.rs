@@ -38,4 +38,16 @@ impl MathCoreWrapper {
             }
         }
     }
+
+    #[func]
+    fn numerical_integrate(expression: GString, var: GString, lower: f64, upper: f64) -> f64 {
+        match MathCore::numerical_integrate(&expression.to_string(), &var.to_string(), lower, upper)
+        {
+            Ok(sum) => sum,
+            Err(e) => {
+                godot_error!("{e}");
+                f64::NAN
+            }
+        }
+    }
 }
