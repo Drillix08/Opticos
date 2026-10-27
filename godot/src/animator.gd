@@ -52,13 +52,22 @@ func _draw() -> void:
 			draw_rect(rectangle, Color.BLACK, false, 1) # rectangle outline
 		# Draw function value labels
 		if len(rectangles) <= LABEL_LIMIT:
+			var height_label_y_pos = rectangle.position.y
+			var width_label_y_pos = rectangle.position.y + rectangle.size.y
+			if rectangle.size.y >= 0:
+				height_label_y_pos -= TOP_LABEL_OFFSET
+				width_label_y_pos += BOTTOM_LABEL_OFFSET
+			else:
+				height_label_y_pos += BOTTOM_LABEL_OFFSET
+				width_label_y_pos -= TOP_LABEL_OFFSET
+			# Rectangle height label
 			draw_string(ThemeDB.fallback_font,
-					Vector2(rectangle.position.x, rectangle.position.y - TOP_LABEL_OFFSET),
-					str(rectangle.size.y))
+					Vector2(rectangle.position.x, height_label_y_pos),
+					"%.1f" % rectangle.size.y)
+			# Rectangle width label
 			draw_string(ThemeDB.fallback_font,
-					Vector2(rectangle.position.x,
-							rectangle.position.y + rectangle.size.y + BOTTOM_LABEL_OFFSET),
-					str(rectangle.size.x))
+					Vector2(rectangle.position.x, width_label_y_pos),
+					"%.1f" % rectangle.size.x)
 	# this if for drawing on top of integral
 	for line in functionLines:
 		if(line[0].x < animProgLeft || line[1].x > animProgRight): draw_line(line[0], line[1], lineColor, 2)
