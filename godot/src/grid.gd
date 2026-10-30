@@ -45,42 +45,62 @@ func refresh_pixel_positions(xOffset, yOffset):
 
 func _draw():
 	#Draw the vertical lines of the grid
-	for x in range(0, 2*(int(window_size.x)), grid_spacing):
+	for x in range(0, int(window_size.x)/2/grid_spacing + 2):
+		var color = Color(0.5, 0.5, 0.5)
 		#offset values the pixel positions of the graph objects
 		#have from their original positions when the origin was at initialization
 		var refreshedPosition :Array = refresh_pixel_positions(origin.x, origin.y)
 		var xOffset :float = refreshedPosition[0]
 		var yOffset :float = refreshedPosition[1]
 		#draw vertical gridline
-		draw_line(Vector2(x+xOffset, yOffset-grid_spacing), Vector2(x+xOffset, 2*window_size.y+yOffset-grid_spacing), gridColor, gridline_thickness)
+		draw_line(Vector2(window_width/2+x*grid_spacing+xOffset, yOffset-grid_spacing), Vector2(window_width/2+x*grid_spacing+xOffset, 2*window_size.y+yOffset-grid_spacing), color, gridline_thickness)
+		draw_line(Vector2(window_width/2-x*grid_spacing+xOffset, yOffset-grid_spacing), Vector2(window_width/2-x*grid_spacing+xOffset, 2*window_size.y+yOffset-grid_spacing), color, gridline_thickness)
+		
 		#draw an x-axis tick
 		@warning_ignore("integer_division")
 		var xTickPos = window_height/2
 		@warning_ignore("integer_division")
-		draw_line(Vector2(x+xOffset, xTickPos-grid_spacing/5+origin.y), Vector2(x+xOffset, xTickPos+grid_spacing/5+origin.y), tickColor, 5*gridline_thickness)
+		draw_line(Vector2(window_width/2+x*grid_spacing+xOffset, xTickPos-grid_spacing/5+origin.y), Vector2(window_width/2+x*grid_spacing+xOffset, xTickPos+grid_spacing/5+origin.y), Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
+		draw_line(Vector2(window_width/2-x*grid_spacing+xOffset, xTickPos-grid_spacing/5+origin.y), Vector2(window_width/2-x*grid_spacing+xOffset, xTickPos+grid_spacing/5+origin.y), Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
 		#draw the number label above the x-axis tick
 		var text_width = 25
-		@warning_ignore("integer_division")
-		var draw_position = Vector2(x+xOffset-text_width/3, xTickPos-grid_spacing/5+origin.y-grid_spacing/15)
-		@warning_ignore("integer_division")
-		var text_to_draw = str((x-window_width/2)/grid_spacing - int((origin.x-sign(origin.x))/grid_spacing))
 		var text_color = Color(0.541, 0.565, 0.541, 1.0) # White color
-		if(text_to_draw != "0"): draw_string(ThemeDB.fallback_font, draw_position, text_to_draw, HORIZONTAL_ALIGNMENT_LEFT, 100, text_width, text_color)
+		@warning_ignore("integer_division")
+		var local_center_pos = Vector2(window_width/2+xOffset-text_width/3, xTickPos-grid_spacing/5+origin.y-grid_spacing/15)
+		var local_center_value :int = -1*int(origin.x/grid_spacing)
+		@warning_ignore("integer_division")
+		var text_to_draw = str(local_center_value)
+		if text_to_draw != "0": draw_string(ThemeDB.fallback_font, local_center_pos, text_to_draw, HORIZONTAL_ALIGNMENT_LEFT, 100, text_width, text_color)
+		
+		@warning_ignore("integer_division")
+		var right_draw_position = local_center_pos + Vector2(int(x*grid_spacing), 0)
+		var right_draw_value :int = local_center_value + x
+		var right_draw_text = str(right_draw_value)
+		if right_draw_text != "0": draw_string(ThemeDB.fallback_font, right_draw_position, right_draw_text, HORIZONTAL_ALIGNMENT_LEFT, 100, text_width, text_color)
+		var left_draw_position = local_center_pos - Vector2(int(x*grid_spacing), 0)
+		var left_draw_value :int = local_center_value - x
+		var left_draw_text = str(left_draw_value)
+		if left_draw_text != "0": draw_string(ThemeDB.fallback_font, left_draw_position, left_draw_text, HORIZONTAL_ALIGNMENT_LEFT, 100, text_width, text_color)
+		
 	#Draw the horizontal lines of the grid
-	for y in range(0, 2*(int(window_size.y)), grid_spacing):
+	for y in range(0, int(window_size.y)/2/grid_spacing + 2):
+		var color = Color(0.5, 0.5, 0.5)
 		#offset values the pixel positions of the graph objects
 		#have from their original positions when the origin was at initialization
 		var refreshedPosition :Array = refresh_pixel_positions(origin.x, origin.y)
 		var xOffset :float = refreshedPosition[0]
 		var yOffset :float = refreshedPosition[1]
 		#Draw horizontal gridline
-		draw_line(Vector2(xOffset-grid_spacing, y+yOffset), Vector2(2*window_size.x+xOffset-grid_spacing, y+yOffset), gridColor, gridline_thickness)
+		draw_line(Vector2(xOffset-grid_spacing, window_height/2+y*grid_spacing+yOffset), Vector2(2*window_size.x+xOffset-grid_spacing, window_height/2+y*grid_spacing+yOffset), color, gridline_thickness)
+		draw_line(Vector2(xOffset-grid_spacing, window_height/2-y*grid_spacing+yOffset), Vector2(2*window_size.x+xOffset-grid_spacing, window_height/2-y*grid_spacing+yOffset), color, gridline_thickness)
 		#draw a y-axis tick
 		@warning_ignore("integer_division")
 		var yTickPos = window_width/2
 		@warning_ignore("integer_division")
-		draw_line(Vector2(yTickPos-grid_spacing/5+origin.x, y+yOffset), Vector2(yTickPos+grid_spacing/5+origin.x, y+yOffset), tickColor, 5*gridline_thickness)
+		draw_line(Vector2(yTickPos-grid_spacing/5+origin.x, window_height/2+y*grid_spacing+yOffset), Vector2(yTickPos+grid_spacing/5+origin.x, window_height/2+y*grid_spacing+yOffset), Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
+		draw_line(Vector2(yTickPos-grid_spacing/5+origin.x, window_height/2-y*grid_spacing+yOffset), Vector2(yTickPos+grid_spacing/5+origin.x, window_height/2-y*grid_spacing+yOffset), Color(0.0, 0.0, 0.0, 1.0), 5*gridline_thickness)
 		#draw the number label above the y-axis tick
+		'''
 		var text_width = 25
 		@warning_ignore("integer_division")
 		var draw_position = Vector2(yTickPos+grid_spacing/15+origin.x, y+yOffset-text_width/3)
@@ -88,6 +108,25 @@ func _draw():
 		var text_to_draw = str(-1*((y-window_height/2)/grid_spacing - int((origin.y-sign(origin.y))/grid_spacing)))
 		var text_color = Color(0.541, 0.565, 0.541, 1.0) # White color
 		draw_string(ThemeDB.fallback_font, draw_position, text_to_draw, HORIZONTAL_ALIGNMENT_LEFT, 100, text_width, text_color)
+		'''
+		var text_width = 25
+		var text_color = Color(0.541, 0.565, 0.541, 1.0) # White color
+		@warning_ignore("integer_division")
+		var local_center_pos = Vector2(yTickPos+grid_spacing/15+origin.x, window_height/2+yOffset-text_width/3)
+		var local_center_value :int = int(origin.y/grid_spacing)
+		@warning_ignore("integer_division")
+		var text_to_draw = str(local_center_value)
+		draw_string(ThemeDB.fallback_font, local_center_pos, text_to_draw, HORIZONTAL_ALIGNMENT_LEFT, 100, text_width, text_color)
+
+		@warning_ignore("integer_division")
+		var top_draw_position = local_center_pos + Vector2(0, -1*int(y*grid_spacing))
+		var top_draw_value :int = local_center_value + y
+		var top_draw_text = str(top_draw_value)
+		draw_string(ThemeDB.fallback_font, top_draw_position, top_draw_text, HORIZONTAL_ALIGNMENT_LEFT, 100, text_width, text_color)
+		var bottom_draw_position = local_center_pos - Vector2(0, -1*int(y*grid_spacing))
+		var bottom_draw_value :int = local_center_value - y
+		var bottom_draw_text = str(bottom_draw_value)
+		draw_string(ThemeDB.fallback_font, bottom_draw_position, bottom_draw_text, HORIZONTAL_ALIGNMENT_LEFT, 100, text_width, text_color)
 	#Draw x-axis
 	@warning_ignore("integer_division")
 	draw_line(Vector2(-origin.x, window_height/2) + origin, Vector2(window_width-origin.x, window_height/2) + origin, axisColor, 5*gridline_thickness)
