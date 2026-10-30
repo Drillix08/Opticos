@@ -41,6 +41,14 @@ text = ">"
 layout_mode = 2
 text = "<"
 
+[node name="SpeedUp" type="Button" parent="Control/Animator/AnimationControls" unique_id=2086834503]
+layout_mode = 2
+text = ">>"
+
+[node name="SlowDown" type="Button" parent="Control/Animator/AnimationControls" unique_id=1994145305]
+layout_mode = 2
+text = "<<"
+
 [node name="InputPanel" type="Control" parent="Control" unique_id=1218166971]
 anchors_preset = 0
 script = ExtResource("4_inputpanel")
@@ -56,3 +64,5 @@ script = ExtResource("5_juirp")
 [connection signal="pressed" from="Control/Animator/AnimationControls/PlayPause" to="Control/Animator" method="_on_play_pause_pressed"]
 [connection signal="pressed" from="Control/Animator/AnimationControls/Next" to="Control/Animator" method="_on_next_pressed"]
 [connection signal="pressed" from="Control/Animator/AnimationControls/Back" to="Control/Animator" method="_on_back_pressed"]
+[connection signal="pressed" from="Control/Animator/AnimationControls/SpeedUp" to="Control/Animator" method="_on_speed_up_pressed"]
+[connection signal="pressed" from="Control/Animator/AnimationControls/SlowDown" to="Control/Animator" method="_on_slow_down_pressed"]
