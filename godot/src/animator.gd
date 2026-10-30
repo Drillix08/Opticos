@@ -1,12 +1,13 @@
 extends Control
 const Util = preload("res://src/util.gd")
 
-signal do_something(something: int)
+signal step_frame(something: int)
 signal leftProg(n: int)
 signal rightProg(n: int)
 var animating: bool = false
 var stepSize: int = 1
 var moveDirection
+var speed_multiplier: float = 1.0
 
 var lineColor = Color.YELLOW
 var functionColor = Color.RED
@@ -92,6 +93,8 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 			add_child(limit_point)
 			break
 
+	speed = 0.001
+
 	var rect: TextureRect = null
 	var rect2: TextureRect = null
 	var coordLabel: CoordLabel = null
@@ -125,7 +128,7 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 		if(i == endpoint): _on_play_pause_pressed()
 		#Paused stuff
 		if(pause):
-			var action: int = await do_something
+			var action: int = await step_frame
 			if(action == -1): #back
 				j += 2
 				i -= 2
@@ -156,8 +159,8 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 		if(left): animProgLeft = i
 		if(right): animProgRight = j
 		queue_redraw()
-		await get_tree().create_timer(speed).timeout
-		speed *= rate
+		await get_tree().create_timer(speed * speed_multiplier).timeout
+		speed = clampf(speed * rate, 0.00001, 8)
 	animating = false
 	$AnimationControls.visible = false
 	if(left): 
@@ -225,7 +228,7 @@ func animate_derivative(x: float):
 		rect.position = functionValues[i] - rect.size/2
 		coordLabel.position = rect.position + rect.size/2
 		if(pause):
-			var action: int = await do_something
+			var action: int = await step_frame
 			if action == -1:
 				i += 2
 				i = min(i, len(functionValues))
@@ -252,7 +255,7 @@ func animate_derivative(x: float):
 		secant_line_left = Util.convert_to_godot_coords(origin, Vector2(x0, y0))
 		secant_line_right = Util.convert_to_godot_coords(origin, Vector2(x1, y1))
 		queue_redraw()
-		await get_tree().create_timer(speed).timeout
+		await get_tree().create_timer(speed * speed_multiplier).timeout
 		i -= 1
 	#perform one more update after the fact
 	coordLabel.text = "(%.0f, " % Util.convert_to_real_coords(origin, functionValues[i])[0] + "%.3f" % Util.convert_to_real_coords(origin, functionValues[i])[1] + ")"
@@ -349,13 +352,13 @@ func animate_Integral(type: String, left_bound: float, right_bound: float, expr:
 
 		queue_redraw()
 		if !pause:
-			await get_tree().create_timer(speed).timeout
+			await get_tree().create_timer(speed * speed_multiplier).timeout
 		else:
 			await get_tree().create_timer(0.001).timeout
 		rectangles.clear()
 		currentRectangleCount *= 2
 		if(pause): 
-			var action: int = await do_something
+			var action: int = await step_frame
 			if action == -1:
 				@warning_ignore("integer_division")
 				currentRectangleCount /= 4
@@ -375,13 +378,22 @@ func animate_Integral(type: String, left_bound: float, right_bound: float, expr:
 func _on_play_pause_pressed() -> void:
 	pause = !pause
 	if(!pause): 
-		do_something.emit(0)
+		step_frame.emit(0)
 		$AnimationControls/PlayPause.text = "Pause"
 	else:
 		$AnimationControls/PlayPause.text = "Play"
 
 func _on_next_pressed() -> void:
-	do_something.emit(1)
+	step_frame.emit(1)
 
 func _on_back_pressed() -> void:
-	do_something.emit(-1)
+	step_frame.emit(-1)
+
+
+func _on_speed_up_pressed() -> void:
+	speed_multiplier = clampf(speed_multiplier * 0.5, 0.00390625, 256.0)
+	print(speed_multiplier)
+
+func _on_slow_down_pressed() -> void:
+	speed_multiplier = clampf(speed_multiplier * 2.0, 0.00390625, 256.0) 
+	print(speed_multiplier)
