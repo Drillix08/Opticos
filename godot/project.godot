@@ -15,7 +15,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="Opticos"
-run/main_scene="uid://dlgeh0w3vomer"
+run/main_scene="uid://eplu7tu8wr4"
 config/features=PackedStringArray("4.7", "C#", "Forward Plus")
 config/icon="uid://dewmaj5jqumcl"
 
