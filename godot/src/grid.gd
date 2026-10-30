@@ -58,6 +58,7 @@ func _draw():
 		#draw vertical gridline
 		draw_line(Vector2(window_width/2+x*grid_spacing+xOffset, yOffset-grid_spacing), Vector2(window_width/2+x*grid_spacing+xOffset, 2*window_size.y+yOffset-grid_spacing), gridColor, gridline_thickness)
 		draw_line(Vector2(window_width/2-x*grid_spacing+xOffset, yOffset-grid_spacing), Vector2(window_width/2-x*grid_spacing+xOffset, 2*window_size.y+yOffset-grid_spacing), gridColor, gridline_thickness)
+
 		
 		#draw an x-axis tick
 		@warning_ignore("integer_division")
@@ -65,6 +66,7 @@ func _draw():
 		@warning_ignore("integer_division")
 		draw_line(Vector2(window_width/2+x*grid_spacing+xOffset, xTickPos-grid_spacing/5+origin.y), Vector2(window_width/2+x*grid_spacing+xOffset, xTickPos+grid_spacing/5+origin.y), tickColor, 5*gridline_thickness)
 		draw_line(Vector2(window_width/2-x*grid_spacing+xOffset, xTickPos-grid_spacing/5+origin.y), Vector2(window_width/2-x*grid_spacing+xOffset, xTickPos+grid_spacing/5+origin.y), tickColor, 5*gridline_thickness)
+
 		#draw the number label above the x-axis tick
 		var text_width = 25
 		var text_color = Color(0.541, 0.565, 0.541, 1.0) # White color
@@ -96,12 +98,15 @@ func _draw():
 		#Draw horizontal gridline
 		draw_line(Vector2(xOffset-grid_spacing, window_height/2+y*grid_spacing+yOffset), Vector2(2*window_size.x+xOffset-grid_spacing, window_height/2+y*grid_spacing+yOffset), gridColor, gridline_thickness)
 		draw_line(Vector2(xOffset-grid_spacing, window_height/2-y*grid_spacing+yOffset), Vector2(2*window_size.x+xOffset-grid_spacing, window_height/2-y*grid_spacing+yOffset), gridColor, gridline_thickness)
+		
 		#draw a y-axis tick
 		@warning_ignore("integer_division")
 		var yTickPos = window_width/2
 		@warning_ignore("integer_division")
+
 		draw_line(Vector2(yTickPos-grid_spacing/5+origin.x, window_height/2+y*grid_spacing+yOffset), Vector2(yTickPos+grid_spacing/5+origin.x, window_height/2+y*grid_spacing+yOffset), tickColor, 5*gridline_thickness)
 		draw_line(Vector2(yTickPos-grid_spacing/5+origin.x, window_height/2-y*grid_spacing+yOffset), Vector2(yTickPos+grid_spacing/5+origin.x, window_height/2-y*grid_spacing+yOffset), tickColor, 5*gridline_thickness)
+
 		#draw the number label above the y-axis tick
 		'''
 		var text_width = 25
@@ -132,6 +137,7 @@ func _draw():
 		draw_string(ThemeDB.fallback_font, bottom_draw_position, bottom_draw_text, HORIZONTAL_ALIGNMENT_LEFT, 100, text_width, text_color)
 	
 	#draw_circle(Vector2(window_width/2, window_height/2), 50.0, Color.RED)
+
 	#Draw x-axis
 	@warning_ignore("integer_division")
 	draw_line(Vector2(-origin.x, window_height/2) + origin, Vector2(window_width-origin.x, window_height/2) + origin, axisColor, 5*gridline_thickness)
