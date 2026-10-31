@@ -43,6 +43,7 @@ func _ready() -> void:
 	
 func _draw() -> void:
 	const LABEL_LIMIT = 64
+	const X_LABEL_OFFSET = 5.0
 	const TOP_LABEL_OFFSET = 10.0
 	const BOTTOM_LABEL_OFFSET = 20.0
 	draw_line(secant_line_left, secant_line_right, lineColor)
@@ -62,11 +63,11 @@ func _draw() -> void:
 				width_label_y_pos -= TOP_LABEL_OFFSET
 			# Rectangle height label
 			draw_string(ThemeDB.fallback_font,
-					Vector2(rectangle.position.x, height_label_y_pos),
+					Vector2(rectangle.position.x + X_LABEL_OFFSET, height_label_y_pos),
 					"%.1f" % rectangle.size.y)
 			# Rectangle width label
 			draw_string(ThemeDB.fallback_font,
-					Vector2(rectangle.position.x, width_label_y_pos),
+					Vector2(rectangle.position.x + X_LABEL_OFFSET, width_label_y_pos),
 					"%.1f" % rectangle.size.x)
 	# this if for drawing on top of integral
 	for line in functionLines:
