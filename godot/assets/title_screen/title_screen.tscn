@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://eplu7tu8wr4"]
 
 [ext_resource type="Script" uid="uid://d03tea1uegfg0" path="res://assets/title_screen/2d_graph_button.gd" id="1_ymcl0"]
+[ext_resource type="Script" uid="uid://cs12yr7k8amqu" path="res://assets/title_screen/3d_graph_button.gd" id="2_ymcl0"]
 
 [node name="TitleScreen" type="Node2D" unique_id=409708784]
 
@@ -38,5 +39,7 @@ offset_bottom = 460.0
 theme_override_font_sizes/font_size = 48
 text = "3D Graph
 Environment"
+script = ExtResource("2_ymcl0")
 
 [connection signal="pressed" from="ColorRect/2dGraphButton" to="ColorRect/2dGraphButton" method="_on_pressed"]
+[connection signal="pressed" from="ColorRect/3dGraphButton" to="ColorRect/3dGraphButton" method="_on_pressed"]

@@ -1,0 +1,213 @@
+[gd_scene format=3 uid="uid://cq03jr0d1k5vo"]
+
+[ext_resource type="Script" uid="uid://paeat0abj2o1" path="res://assets/3d_environment/3d_env.gd" id="1_7mycd"]
+[ext_resource type="Script" uid="uid://fl16hrl6wf1h" path="res://assets/3d_environment/camera.gd" id="1_ig7tw"]
+[ext_resource type="BoxMesh" uid="uid://bf41s60wddban" path="res://assets/3d_environment/3d_assets/red_box_mesh.tres" id="2_h2yge"]
+[ext_resource type="PackedScene" uid="uid://dr2ugm6hjg125" path="res://assets/3d_environment/line_pixel.tscn" id="2_lquwl"]
+[ext_resource type="BoxMesh" uid="uid://s6ulcgwdwse1" path="res://assets/3d_environment/3d_assets/blue_box_mesh.tres" id="3_1bvp3"]
+[ext_resource type="BoxMesh" uid="uid://bc31u22k40dkd" path="res://assets/3d_environment/3d_assets/green_box_mesh.tres" id="4_1bvp3"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7mycd"]
+albedo_color = Color(0.8784314, 0.8784314, 0.8784314, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_272bh"]
+material = SubResource("StandardMaterial3D_7mycd")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ig7tw"]
+albedo_color = Color(0, 0, 0, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_0xm2m"]
+material = SubResource("StandardMaterial3D_ig7tw")
+
+[node name="Main" type="Node" unique_id=749982082]
+script = ExtResource("1_7mycd")
+linepixel = ExtResource("2_lquwl")
+
+[node name="LineDrawer" type="MeshInstance3D" parent="." unique_id=552464136]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, 0)
+mesh = SubResource("BoxMesh_272bh")
+
+[node name="Camera" type="Camera3D" parent="." unique_id=1499696717]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 3, 6)
+script = ExtResource("1_ig7tw")
+
+[node name="Label" type="Label" parent="Camera" unique_id=2114255386]
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 122.0
+offset_bottom = 33.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "Mode: Free Fly"
+
+[node name="DirectionalLight1" type="DirectionalLight3D" parent="." unique_id=1993945275]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 12, 0)
+
+[node name="DirectionalLight2" type="DirectionalLight3D" parent="." unique_id=1255770270]
+transform = Transform3D(0.70710677, 0, -0.70710677, 0, 1, 0, 0.70710677, 0, 0.70710677, -8, 3, 8)
+
+[node name="DirectionalLight3" type="DirectionalLight3D" parent="." unique_id=1063371949]
+transform = Transform3D(0.7071067, 0, 0.7071067, 0, 1, 0, -0.7071067, 0, 0.7071067, 8, 3, 8)
+
+[node name="DirectionalLight4" type="DirectionalLight3D" parent="." unique_id=1970050926]
+transform = Transform3D(-0.9999999, 0, -8.742277e-08, 0, 1, 0, 8.742277e-08, 0, -0.9999999, 0, 3, -10)
+
+[node name="DirectionalLight5" type="DirectionalLight3D" parent="." unique_id=1265774194]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, -5, 0)
+
+[node name="Grid" type="Node3D" parent="." unique_id=245541078]
+
+[node name="X-Axis" type="MeshInstance3D" parent="Grid" unique_id=1587214813]
+transform = Transform3D(16, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
+mesh = SubResource("BoxMesh_0xm2m")
+
+[node name="X-Line-Y2pos" type="MeshInstance3D" parent="Grid" unique_id=657566794]
+transform = Transform3D(16, 0, 0, 0, 0.05, 0, 0, 0, 0.05, 0, 2, 0)
+mesh = ExtResource("2_h2yge")
+
+[node name="X-Line-Z2pos" type="MeshInstance3D" parent="Grid" unique_id=601952841]
+transform = Transform3D(16, 0, 0, 0, 0.05, 0, 0, 0, 0.05, 0, 0, 2)
+mesh = ExtResource("3_1bvp3")
+
+[node name="X-Line-Z4pos" type="MeshInstance3D" parent="Grid" unique_id=1142275099]
+transform = Transform3D(16, 0, 0, 0, 0.05, 0, 0, 0, 0.05, 0, 0, 4)
+mesh = ExtResource("3_1bvp3")
+
+[node name="X-Line-Z6pos" type="MeshInstance3D" parent="Grid" unique_id=2045611682]
+transform = Transform3D(16, 0, 0, 0, 0.05, 0, 0, 0, 0.05, 0, 0, 6)
+mesh = ExtResource("3_1bvp3")
+
+[node name="X-Line-Z2neg" type="MeshInstance3D" parent="Grid" unique_id=1420416188]
+transform = Transform3D(16, 0, 0, 0, 0.05, 0, 0, 0, 0.05, 0, 0, -2)
+mesh = ExtResource("3_1bvp3")
+
+[node name="X-Line-Z4neg" type="MeshInstance3D" parent="Grid" unique_id=341568446]
+transform = Transform3D(16, 0, 0, 0, 0.05, 0, 0, 0, 0.05, 0, 0, -4)
+mesh = ExtResource("3_1bvp3")
+
+[node name="X-Line-Z6neg" type="MeshInstance3D" parent="Grid" unique_id=595066787]
+transform = Transform3D(16, 0, 0, 0, 0.05, 0, 0, 0, 0.05, 0, 0, -6)
+mesh = ExtResource("3_1bvp3")
+
+[node name="X-Line-Y4pos" type="MeshInstance3D" parent="Grid" unique_id=1667825974]
+transform = Transform3D(16, 0, 0, 0, 0.05, 0, 0, 0, 0.05, 0, 4, 0)
+mesh = ExtResource("2_h2yge")
+
+[node name="X-Line-Y6pos" type="MeshInstance3D" parent="Grid" unique_id=1674880469]
+transform = Transform3D(16, 0, 0, 0, 0.05, 0, 0, 0, 0.05, 0, 6, 0)
+mesh = ExtResource("2_h2yge")
+
+[node name="Z-Axis" type="MeshInstance3D" parent="Grid" unique_id=1733007514]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 16, 0, 0, 0)
+mesh = SubResource("BoxMesh_0xm2m")
+
+[node name="Z-Line-Y2pos" type="MeshInstance3D" parent="Grid" unique_id=1316742679]
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 16, 0, 2, 0)
+mesh = ExtResource("4_1bvp3")
+
+[node name="Z-Line-X2pos" type="MeshInstance3D" parent="Grid" unique_id=1754111636]
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 16, 2, 0, 0)
+mesh = ExtResource("3_1bvp3")
+
+[node name="Z-Line-X4pos" type="MeshInstance3D" parent="Grid" unique_id=424132168]
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 16, 4, 0, 0)
+mesh = ExtResource("3_1bvp3")
+
+[node name="Z-Line-X6pos" type="MeshInstance3D" parent="Grid" unique_id=395596633]
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 16, 6, 0, 0)
+mesh = ExtResource("3_1bvp3")
+
+[node name="Z-Line-X2neg" type="MeshInstance3D" parent="Grid" unique_id=527243663]
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 16, -2, 0, 0)
+mesh = ExtResource("3_1bvp3")
+
+[node name="Z-Line-X4neg" type="MeshInstance3D" parent="Grid" unique_id=144563932]
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 16, -4, 0, 0)
+mesh = ExtResource("3_1bvp3")
+
+[node name="Z-Line-X6neg" type="MeshInstance3D" parent="Grid" unique_id=817390255]
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 16, -6, 0, 0)
+mesh = ExtResource("3_1bvp3")
+
+[node name="Z-Line-Y4pos" type="MeshInstance3D" parent="Grid" unique_id=861769836]
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 16, 0, 4, 0)
+mesh = ExtResource("4_1bvp3")
+
+[node name="Z-Line-Y6pos" type="MeshInstance3D" parent="Grid" unique_id=837560327]
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 16, 0, 6, 0)
+mesh = ExtResource("4_1bvp3")
+
+[node name="X-Line-Y2neg" type="MeshInstance3D" parent="Grid" unique_id=429648333]
+transform = Transform3D(16, 0, 0, 0, 0.05, 0, 0, 0, 0.05, 0, -2, 0)
+mesh = ExtResource("2_h2yge")
+
+[node name="X-Line-Y4neg" type="MeshInstance3D" parent="Grid" unique_id=2084421394]
+transform = Transform3D(16, 0, 0, 0, 0.05, 0, 0, 0, 0.05, 0, -4, 0)
+mesh = ExtResource("2_h2yge")
+
+[node name="X-Line-Y6neg" type="MeshInstance3D" parent="Grid" unique_id=851090703]
+transform = Transform3D(16, 0, 0, 0, 0.05, 0, 0, 0, 0.05, 0, -6, 0)
+mesh = ExtResource("2_h2yge")
+
+[node name="Z-Line-Y2neg" type="MeshInstance3D" parent="Grid" unique_id=645347276]
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 16, 0, -2, 0)
+mesh = ExtResource("4_1bvp3")
+
+[node name="Z-Line-Y4neg" type="MeshInstance3D" parent="Grid" unique_id=131975795]
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 16, 0, -4, 0)
+mesh = ExtResource("4_1bvp3")
+
+[node name="Z-Line-Y6neg" type="MeshInstance3D" parent="Grid" unique_id=954770773]
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 16, 0, -6, 0)
+mesh = ExtResource("4_1bvp3")
+
+[node name="Y-Axis" type="MeshInstance3D" parent="Grid" unique_id=1695849315]
+transform = Transform3D(0.1, 0, 0, 0, 16, 0, 0, 0, 0.1, 0, 0, 0)
+mesh = SubResource("BoxMesh_0xm2m")
+
+[node name="Y-Line-X2pos" type="MeshInstance3D" parent="Grid" unique_id=880618427]
+transform = Transform3D(0.05, 0, 0, 0, 16, 0, 0, 0, 0.05, 2, 0, 0)
+mesh = ExtResource("2_h2yge")
+
+[node name="Y-Line-X4pos" type="MeshInstance3D" parent="Grid" unique_id=2113665241]
+transform = Transform3D(0.05, 0, 0, 0, 16, 0, 0, 0, 0.05, 4, 0, 0)
+mesh = ExtResource("2_h2yge")
+
+[node name="Y-Line-X6pos" type="MeshInstance3D" parent="Grid" unique_id=1276742745]
+transform = Transform3D(0.05, 0, 0, 0, 16, 0, 0, 0, 0.05, 6, 0, 0)
+mesh = ExtResource("2_h2yge")
+
+[node name="Y-Line-X2neg" type="MeshInstance3D" parent="Grid" unique_id=1178363258]
+transform = Transform3D(0.05, 0, 0, 0, 16, 0, 0, 0, 0.05, -2, 0, 0)
+mesh = ExtResource("2_h2yge")
+
+[node name="Y-Line-X4neg" type="MeshInstance3D" parent="Grid" unique_id=1810315196]
+transform = Transform3D(0.05, 0, 0, 0, 16, 0, 0, 0, 0.05, -4, 0, 0)
+mesh = ExtResource("2_h2yge")
+
+[node name="Y-Line-X6neg" type="MeshInstance3D" parent="Grid" unique_id=1678110976]
+transform = Transform3D(0.05, 0, 0, 0, 16, 0, 0, 0, 0.05, -6, 0, 0)
+mesh = ExtResource("2_h2yge")
+
+[node name="Y-Line-Z2pos" type="MeshInstance3D" parent="Grid" unique_id=209549335]
+transform = Transform3D(0.05, 0, 0, 0, 16, 0, 0, 0, 0.05, 0, 0, 2)
+mesh = ExtResource("4_1bvp3")
+
+[node name="Y-Line-Z4pos" type="MeshInstance3D" parent="Grid" unique_id=883895792]
+transform = Transform3D(0.05, 0, 0, 0, 16, 0, 0, 0, 0.05, 0, 0, 4)
+mesh = ExtResource("4_1bvp3")
+
+[node name="Y-Line-Z6pos" type="MeshInstance3D" parent="Grid" unique_id=896187849]
+transform = Transform3D(0.05, 0, 0, 0, 16, 0, 0, 0, 0.05, 0, 0, 6)
+mesh = ExtResource("4_1bvp3")
+
+[node name="Y-Line-Z2neg" type="MeshInstance3D" parent="Grid" unique_id=2074449340]
+transform = Transform3D(0.05, 0, 0, 0, 16, 0, 0, 0, 0.05, 0, 0, -2)
+mesh = ExtResource("4_1bvp3")
+
+[node name="Y-Line-Z4neg" type="MeshInstance3D" parent="Grid" unique_id=856040792]
+transform = Transform3D(0.05, 0, 0, 0, 16, 0, 0, 0, 0.05, 0, 0, -4)
+mesh = ExtResource("4_1bvp3")
+
+[node name="Y-Line-Z6neg" type="MeshInstance3D" parent="Grid" unique_id=2051372618]
+transform = Transform3D(0.05, 0, 0, 0, 16, 0, 0, 0, 0.05, 0, 0, -6)
+mesh = ExtResource("4_1bvp3")
