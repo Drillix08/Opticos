@@ -135,21 +135,23 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 					j += 1
 					i -= 1
 		#updating positions
-		if(left && i >= 0): 
-			rect.visible = true
-			coordLabel.visible = true
-			update_position(functionValues[i], rect, coordLabel)
-		else:
-			rect.visible = false
-			coordLabel.visible = false
-		if(right && j + 1 <= window_size.x): 
-			rect2.visible = true
-			coordLabel2.visible = true
-			update_position(functionValues[j], rect2, coordLabel2)
-		else:
-			rect2.visible = false
-			coordLabel2.visible = false
-		if(coordLabel != null && coordLabel.position.x + coordLabel.size.x > coordLabel2.position.x && coordLabel.position.y < coordLabel2.position.y + coordLabel2.size.y):
+		if (left):
+			if (i >= 0): 
+				rect.visible = true
+				coordLabel.visible = true
+				update_position(functionValues[i], rect, coordLabel)
+			else:
+				rect.visible = false
+				coordLabel.visible = false
+		if (right):
+			if (j + 1 <= window_size.x): 
+				rect2.visible = true
+				coordLabel2.visible = true
+				update_position(functionValues[j], rect2, coordLabel2)
+			else:
+				rect2.visible = false
+				coordLabel2.visible = false
+		if(coordLabel != null && coordLabel2 != null && coordLabel.position.x + coordLabel.size.x > coordLabel2.position.x && coordLabel.position.y < coordLabel2.position.y + coordLabel2.size.y):
 			coordLabel2.position.y = coordLabel2.position.y - coordLabel2.size.y
 			coordLabel2.check_coords()
 		i += 1
