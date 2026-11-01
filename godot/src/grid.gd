@@ -108,15 +108,6 @@ func _draw():
 		draw_line(Vector2(yTickPos-grid_spacing/5+origin.x, window_height/2-y*grid_spacing+yOffset), Vector2(yTickPos+grid_spacing/5+origin.x, window_height/2-y*grid_spacing+yOffset), tickColor, 5*gridline_thickness)
 
 		#draw the number label above the y-axis tick
-		'''
-		var text_width = 25
-		@warning_ignore("integer_division")
-		var draw_position = Vector2(yTickPos+grid_spacing/15+origin.x, y+yOffset-text_width/3)
-		@warning_ignore("integer_division")
-		var text_to_draw = str(-1*((y-window_height/2)/grid_spacing - int((origin.y-sign(origin.y))/grid_spacing)))
-		var text_color = Color(0.541, 0.565, 0.541, 1.0) # White color
-		draw_string(ThemeDB.fallback_font, draw_position, text_to_draw, HORIZONTAL_ALIGNMENT_LEFT, 100, text_width, text_color)
-		'''
 		var text_width = 25
 		var text_color = Color(0.541, 0.565, 0.541, 1.0) # White color
 		@warning_ignore("integer_division")
