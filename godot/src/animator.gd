@@ -65,7 +65,7 @@ func prepare_to_animate(_function_values: Array[Vector2], _origin: Vector2, _gri
 
 func update_position(point: Vector2, rect: TextureRect, label: CoordLabel):
 	var coords: Vector2 = Util.convert_to_real_coords(origin, point)
-	label.text = "(%.2f, " % (coords.x/100.0) + "%.4f" % (coords.y/100) + ")"
+	label.text = "(%.2f, " % (coords.x/100.0) + "%.2f" % (coords.y/100) + ")"
 
 	rect.position = point - rect.size/2
 	label.position = rect.position + rect.size/2
@@ -76,7 +76,7 @@ func update_position(point: Vector2, rect: TextureRect, label: CoordLabel):
 ## initially at [code]speed[/code] seconds per point slowing at a rate of [code]rate[/code] per point
 func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool, speed: float, rate: float, _step: int = 1):
 	if(!(right || left)): return 
-	var endpoint: float = Util.convert_to_godot_coords(origin, Vector2(limit,0)).x
+	var endpoint: float = Util.convert_to_godot_coords(origin, Vector2(limit*grid_spacing,0)).x
 	if(endpoint < 0 || endpoint > window_size.x): return
 	if(endpoint < 0): return
 	#step -= 1
@@ -90,6 +90,7 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 			limit_point.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			limit_point.size = Vector2(20, 20)
 			limit_point.position = coords - Vector2(10, 10)
+			print("position: " + str(limit_point.position))
 			add_child(limit_point)
 			break
 
@@ -118,11 +119,8 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 		coordLabel2 = CoordLabel.new()
 		add_child(coordLabel2)
 	var distanceFromLimit = max(endpoint, abs(window_size.x - endpoint))
-	print(distanceFromLimit)
 	var i: int = endpoint - distanceFromLimit
 	var j: int = endpoint + distanceFromLimit
-	print(i, " ", j)
-	print(endpoint)
 
 	while(i <= endpoint):
 		if(i == endpoint): _on_play_pause_pressed()
@@ -140,14 +138,14 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 		if(left && i >= 0): 
 			rect.visible = true
 			coordLabel.visible = true
-			update_position(functionValues[i + 1], rect, coordLabel)
+			update_position(functionValues[i], rect, coordLabel)
 		else:
 			rect.visible = false
 			coordLabel.visible = false
 		if(right && j + 1 <= window_size.x): 
 			rect2.visible = true
 			coordLabel2.visible = true
-			update_position(functionValues[j + 1], rect2, coordLabel2)
+			update_position(functionValues[j], rect2, coordLabel2)
 		else:
 			rect2.visible = false
 			coordLabel2.visible = false
@@ -172,6 +170,7 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 	limit_point.queue_free()
 	animProgLeft = Util.convert_to_real_coords(origin, Vector2(-1,0)).x
 	animProgRight = Util.convert_to_real_coords(origin, Vector2(200000,0)).x
+	functionLines.clear()
 	queue_redraw()
 	pause = false
 	animating = false
