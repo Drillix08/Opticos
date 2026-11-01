@@ -299,14 +299,16 @@ func animate_Integral(type: String, left_bound: float, right_bound: float, expr:
 		definite_integral = MathCoreWrapper.numerical_integrate(expr, "x", left_bound, right_bound)
 
 	# initialize start and end to the left and right bound of the screen
-	var start: int = 1
-	var end: int = len(functionValues)-2
-	for i in range(len(functionValues)):
-		if Util.convert_to_real_coords(origin, functionValues[i])[0] == left_bound*grid_spacing:
-			if i == 0: start = i + 1
-			else: start = i
-		if Util.convert_to_real_coords(origin, functionValues[i])[0] == right_bound*grid_spacing:
-			end = i
+	var true_origin_x: float = origin.x + DisplayServer.window_get_size().x / 2.0
+
+	# pixel index = real_x + true_origin_x
+	var start: int = roundi(left_bound * grid_spacing + true_origin_x)
+	var end: int = roundi(right_bound * grid_spacing + true_origin_x)
+
+	# Keep inside the valid sample range
+	start = clampi(start, 1, len(functionValues) - 2)
+	end = clampi(end, 1, len(functionValues) - 2)
+
 	#var speed = .0015
 	var speed = 1
 	var maxRectangleCount: int = end-start
