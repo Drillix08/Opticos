@@ -2,6 +2,8 @@ extends Node
 
 @export var linepixel: PackedScene
 
+var title_screen = "res://assets/title_screen/title_screen.tscn"
+
 const LINEDRAW_STARTPOS = Vector3(8.0, 8.0, 8.0)
 const LINEDRAW_ENDPOS = Vector3(-8.0, -8.0, -8.0)
 const LINEDRAW_MOVEMENT = Vector3(-0.2, -0.2, -0.2)
@@ -28,6 +30,9 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
+	if Input.is_action_just_pressed("ReturnToTitle"):
+		get_tree().change_scene_to_file(title_screen)
+
 	if vec3_not_equal($LineDrawer.position, LINEDRAW_ENDPOS):
 		$LineDrawer.position += LINEDRAW_MOVEMENT
 		spawn_linepixel()

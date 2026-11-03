@@ -35,6 +35,7 @@ var _integral_left_input:  LineEdit
 var _integral_right_input: LineEdit
 
 var _animate_btn:        Button
+var _title_screen_btn:   Button
 var _error_label:        Label
 
 # ── state ─────────────────────────────────────────────────────────────────────
@@ -144,6 +145,12 @@ func _build_ui() -> void:
 	_animate_btn.text = "▶   Animate"
 	_animate_btn.pressed.connect(_on_animate_pressed)
 	vbox.add_child(_animate_btn)
+	
+	# ── Return to title screen button ────────────────────────────────────────
+	_title_screen_btn = Button.new()
+	_title_screen_btn.text = "Return to title screen"
+	_title_screen_btn.pressed.connect(_on_title_screen_btn_pressed)
+	vbox.add_child(_title_screen_btn)
 
 	# ── Error label ──────────────────────────────────────────────────────────
 	_error_label = Label.new()
@@ -254,6 +261,11 @@ func _make_separator() -> HSeparator:
 	return HSeparator.new()
 
 # ── event handlers ────────────────────────────────────────────────────────────
+
+func _on_title_screen_btn_pressed() -> void:
+	var title_screen = "res://assets/title_screen/title_screen.tscn"
+	get_tree().change_scene_to_file(title_screen)
+
 
 func _on_type_pressed(index: int) -> void:
 	_current_type = index as AnimType
