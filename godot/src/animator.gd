@@ -43,11 +43,33 @@ func _ready() -> void:
 	
 	
 func _draw() -> void:
+	const LABEL_LIMIT = 64
+	const X_LABEL_OFFSET = 5.0
+	const TOP_LABEL_OFFSET = 10.0
+	const BOTTOM_LABEL_OFFSET = 20.0
 	draw_line(secant_line_left, secant_line_right, lineColor)
 	for rectangle in rectangles: 
-		draw_rect(rectangle, lineColor) 
+		draw_rect(rectangle, lineColor)
 		if rectangle.size[0] > 1: # do not draw the border on the final iteration
 			draw_rect(rectangle, Color.BLACK, false, 1) # rectangle outline
+		# Draw function value labels
+		if len(rectangles) <= LABEL_LIMIT:
+			var height_label_y_pos = rectangle.position.y
+			var width_label_y_pos = rectangle.position.y + rectangle.size.y
+			if rectangle.size.y >= 0:
+				height_label_y_pos -= TOP_LABEL_OFFSET
+				width_label_y_pos += BOTTOM_LABEL_OFFSET
+			else:
+				height_label_y_pos += BOTTOM_LABEL_OFFSET
+				width_label_y_pos -= TOP_LABEL_OFFSET
+			# Rectangle height label
+			draw_string(ThemeDB.fallback_font,
+					Vector2(rectangle.position.x + X_LABEL_OFFSET, height_label_y_pos),
+					"%.1f" % rectangle.size.y)
+			# Rectangle width label
+			draw_string(ThemeDB.fallback_font,
+					Vector2(rectangle.position.x + X_LABEL_OFFSET, width_label_y_pos),
+					"%.1f" % rectangle.size.x)
 	# this if for drawing on top of integral
 	for line in functionLines:
 		if(line[0].x < animProgLeft || line[1].x > animProgRight): draw_line(line[0], line[1], lineColor, 2)
