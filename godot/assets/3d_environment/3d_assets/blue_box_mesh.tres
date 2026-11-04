@@ -1,0 +1,6 @@
+[gd_resource type="BoxMesh" format=3 uid="uid://s6ulcgwdwse1"]
+
+[ext_resource type="Material" uid="uid://c43clemst6ipr" path="res://Assets/blue_box_material.tres" id="1_ktjc7"]
+
+[resource]
+material = ExtResource("1_ktjc7")

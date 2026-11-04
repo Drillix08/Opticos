@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://dr2ugm6hjg125"]
+
+[ext_resource type="BoxMesh" uid="uid://dpkp2acuerxly" path="res://assets/3d_environment/3d_assets/orange_box_mesh.tres" id="1_wa8nk"]
+[ext_resource type="Script" uid="uid://xhxm1kuxw1kb" path="res://assets/3d_environment/line_pixel.gd" id="2_bhc7o"]
+
+[node name="LinePixel" type="MeshInstance3D" unique_id=338473267]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)
+mesh = ExtResource("1_wa8nk")
+script = ExtResource("2_bhc7o")
