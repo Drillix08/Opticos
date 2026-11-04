@@ -10,7 +10,7 @@ func _ready() -> void:
 	panel = PanelContainer.new()
 	
 	panel.size = Vector2(150, 0)
-	panel.position = Vector2(get_viewport_rect().size.x * 0.98 - panel.size.x, 12)
+	panel.position = Vector2(12, 462)
 	
 	add_child(panel)
 	

@@ -63,13 +63,13 @@ func _draw() -> void:
 				height_label_y_pos += BOTTOM_LABEL_OFFSET
 				width_label_y_pos -= TOP_LABEL_OFFSET
 			# Rectangle height label
-			draw_string(ThemeDB.fallback_font,
-					Vector2(rectangle.position.x + X_LABEL_OFFSET, height_label_y_pos),
-					"%.1f" % rectangle.size.y)
+			#draw_string(ThemeDB.fallback_font,
+			#		Vector2(rectangle.position.x + X_LABEL_OFFSET, height_label_y_pos),
+			#		"%.1f" % rectangle.size.y)
 			# Rectangle width label
-			draw_string(ThemeDB.fallback_font,
-					Vector2(rectangle.position.x + X_LABEL_OFFSET, width_label_y_pos),
-					"%.1f" % rectangle.size.x)
+			#draw_string(ThemeDB.fallback_font,
+			#		Vector2(rectangle.position.x + X_LABEL_OFFSET, width_label_y_pos),
+			#		"%.1f" % rectangle.size.x)
 	# this if for drawing on top of integral
 	for line in functionLines:
 		if(line[0].x < animProgLeft || line[1].x > animProgRight): draw_line(line[0], line[1], lineColor, 2)
