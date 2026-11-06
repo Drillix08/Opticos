@@ -222,3 +222,41 @@ mesh = ExtResource("4_1bvp3")
 [node name="Y-Line-Z6neg" type="MeshInstance3D" parent="Grid" unique_id=2051372618]
 transform = Transform3D(0.05, 0, 0, 0, 16, 0, 0, 0, 0.05, 0, 0, -6)
 mesh = ExtResource("4_1bvp3")
+
+[node name="AxisLabels" type="Node3D" parent="." unique_id=981731620]
+
+[node name="PositiveX" type="Label3D" parent="AxisLabels" unique_id=420816256]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.2, 0)
+billboard = 1
+text = "+X"
+font_size = 48
+
+[node name="NegativeX" type="Label3D" parent="AxisLabels" unique_id=864677980]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.2, 0)
+billboard = 1
+text = "-X"
+font_size = 48
+
+[node name="PositiveZ" type="Label3D" parent="AxisLabels" unique_id=289104704]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 3)
+billboard = 1
+text = "+Z"
+font_size = 48
+
+[node name="NegativeZ" type="Label3D" parent="AxisLabels" unique_id=2133233354]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -3)
+billboard = 1
+text = "-Z"
+font_size = 48
+
+[node name="PositiveY" type="Label3D" parent="AxisLabels" unique_id=1687183380]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, 3, 0)
+billboard = 1
+text = "+Y"
+font_size = 48
+
+[node name="NegativeY" type="Label3D" parent="AxisLabels" unique_id=1957379848]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, -3, 0)
+billboard = 1
+text = "-Y"
+font_size = 48
