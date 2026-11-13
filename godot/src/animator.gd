@@ -5,8 +5,6 @@ signal step_frame(something: int)
 signal leftProg(n: int)
 signal rightProg(n: int)
 var animating: bool = false
-var stepSize: int = 1
-var moveDirection
 var speed_multiplier: float = 1.0
 
 var lineColor = Color.YELLOW
@@ -28,6 +26,20 @@ var animProgRight: float = Util.convert_to_real_coords(origin, Vector2(200000,0)
 var pause: bool = false
 var frameOffset: int = 0
 
+# for limit
+var animating_limit = false
+var limit: float
+var points: Array[Vector2]
+var left: bool
+var leftPosition: int = -1
+var right: bool
+var rightPosition: int = -1
+var limit_point: TextureRect = null
+var rectLeft: TextureRect = null
+var rectRight: TextureRect = null
+var coordLabelLeft: CoordLabel = null
+var coordLabelRight: CoordLabel = null
+
 # for derivative
 var secant_line_left: Vector2 = Vector2(0, 0)
 var secant_line_right: Vector2 = Vector2(0, 0)
@@ -37,15 +49,11 @@ var rectangles: Array[Rect2]
 
 var labelOffset = 0
 
-var elapsed := 0.0
-var last_frame := 0
-
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	last_frame = Engine.get_physics_frames()
-	
-	
-	
+	pass
+
+
 func _draw() -> void:
 	const LABEL_LIMIT = 64
 	const X_LABEL_OFFSET = 5.0
@@ -78,16 +86,15 @@ func _draw() -> void:
 	for line in functionLines:
 		if(line[0].x < animProgLeft || line[1].x > animProgRight): draw_line(line[0], line[1], lineColor, 2)
 		else: draw_line(line[0], line[1], functionColor, 2)
-		
+	
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	elapsed += _delta
-	if elapsed > 1.0:
-		var current_frame := Engine.get_physics_frames()
-		#print((current_frame - last_frame) / elapsed)
-		last_frame = current_frame
-		elapsed = 0.0
+	if (pause):
+		pass
+	else:
+		if (animating_limit):
+			animate_Limit_Step()
 
 func prepare_to_animate(_function_values: Array[Vector2], _origin: Vector2, _grid_spacing: int, _functionLines: Array[Array]):
 	functionValues = _function_values
@@ -102,133 +109,144 @@ func update_position(point: Vector2, rect: TextureRect, label: CoordLabel):
 	rect.position = point - rect.size/2
 	label.position = rect.position + rect.size/2
 	label.check_coords()
-	pass
 
 ## Function for animating values approaching a limit from left and/or right position
 ## initially at [code]speed[/code] seconds per point slowing at a rate of [code]rate[/code] per point
-func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool, speed: float, rate: float, _step: int = 1):
-	if(!(right || left)): return 
+func animate_Limit(_limit: float, _points: Array[Vector2], _left: bool, _right: bool):
+	if (!_right && !_left): return
+	
+	animating = true
+	animating_limit = true;
+	$AnimationControls.visible = true
+	limit = _limit
+	points = _points
+	left = _left
+	right = _right
+	
+	limit_point = TextureRect.new()
+	add_child(limit_point)
+	
+	rectLeft = TextureRect.new()
+	add_child(rectLeft)
+	coordLabelLeft = CoordLabel.new()
+	add_child(coordLabelLeft)
+	
+	rectRight = TextureRect.new()
+	add_child(rectRight)
+	coordLabelRight = CoordLabel.new()
+	add_child(coordLabelRight)
+
+func stop_animate_limit():
+	animating = false
+	$AnimationControls.visible = false
+	animating_limit = false;
+	pause = false;
+	animProgLeft = Util.convert_to_real_coords(origin, Vector2(-1,0)).x
+	animProgRight = Util.convert_to_real_coords(origin, Vector2(200000,0)).x
+	functionLines.clear()
+	leftPosition = -1
+	rightPosition = -1
+	
+	limit_point.queue_free()
+	limit_point = null
+	
+	rectLeft.queue_free()
+	rectRight.queue_free()
+	coordLabelLeft.queue_free()
+	coordLabelRight.queue_free()
+	rectLeft = null
+	rectRight = null
+	coordLabelLeft = null
+	coordLabelRight = null
+
+func animate_Limit_Step():
 	var endpoint: float = Util.convert_to_godot_coords(origin, Vector2(limit*grid_spacing,0)).x
-	if(endpoint < 0 || endpoint > window_size.x): return
-	if(endpoint < 0): return
+	if(endpoint < 0 || endpoint > window_size.x): 
+		stop_animate_limit()
+		return
 	
 	#step -= 1
-	animating = true
-	$AnimationControls.visible = true
-	var limit_point: TextureRect = null
 	for coords in points:
 		if coords.x == endpoint:
-			limit_point = TextureRect.new()
 			limit_point.texture = load("res://assets/graph_environment/black_circle.png")
 			limit_point.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			limit_point.size = Vector2(20, 20)
 			limit_point.position = coords - Vector2(10, 10)
-			print("position: " + str(limit_point.position))
-			add_child(limit_point)
+			#print("position: " + str(limit_point.position))
 			break
 
-	
-
-	var rect: TextureRect = null
-	var rect2: TextureRect = null
-	var coordLabel: CoordLabel = null
-	var coordLabel2: CoordLabel = null
 	if(left): 
-		rect = TextureRect.new()
-		rect.position = Vector2(0,0)
-		rect.texture = load("res://assets/graph_environment/yellow_circle.png")
-		rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		rect.size = Vector2(10, 10)
-		add_child(rect)
-		coordLabel = CoordLabel.new()
-		add_child(coordLabel)
+		rectLeft.texture = load("res://assets/graph_environment/yellow_circle.png")
+		rectLeft.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		rectLeft.size = Vector2(10, 10)
 	if(right):
-		rect2 = TextureRect.new()
-		rect2.position = Vector2(0,0)
-		rect2.texture = load("res://assets/graph_environment/yellow_circle.png")
-		rect2.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		rect2.size = Vector2(10, 10)
-		add_child(rect2)
-		coordLabel2 = CoordLabel.new()
-		add_child(coordLabel2)
+		rectRight.texture = load("res://assets/graph_environment/yellow_circle.png")
+		rectRight.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		rectRight.size = Vector2(10, 10)
+	
 	var initialDistanceFromLimit = max(endpoint, abs(window_size.x - endpoint))
 	var distanceFromLimit = initialDistanceFromLimit
-	var i: int = endpoint - initialDistanceFromLimit
-	var j: int = endpoint + initialDistanceFromLimit
-	var initialSpeed = speed
-	var stepSize = 5
+	if (leftPosition == -1):
+		leftPosition = endpoint - initialDistanceFromLimit
+	else:
+		distanceFromLimit = endpoint - leftPosition
+	if (rightPosition == -1):
+		rightPosition = endpoint + initialDistanceFromLimit
+	
+	var percent_done = 1 - (distanceFromLimit / initialDistanceFromLimit)
+	print(percent_done)
+	var speed = (1) * speed_multiplier
 
-	while(i <= endpoint):
-		if(i == endpoint): _on_play_pause_pressed()
+	if(leftPosition <= endpoint):
+		if(leftPosition == endpoint): _on_play_pause_pressed()
 		
 		#Paused stuff
 		if(pause):
 			var action: int = await step_frame
 			if(action == -1): #back
-				j += 2
-				i -= 2
+				leftPosition -= 2
+				rightPosition += 2
 			elif(action == 0): #Play
-				if(i != endpoint):
-					j += 1
-					i -= 1
+				if(leftPosition != endpoint):
+					leftPosition -= 1
+					rightPosition += 1
 					
 		#updating positions
 		if (left):
-			if (i >= 0): 
-				rect.visible = true
-				coordLabel.visible = true
-				update_position(functionValues[i], rect, coordLabel)
+			if (leftPosition >= 0): 
+				rectLeft.visible = true
+				coordLabelLeft.visible = true
+				update_position(functionValues[leftPosition], rectLeft, coordLabelLeft)
 			else:
-				rect.visible = false
-				coordLabel.visible = false
+				rectLeft.visible = false
+				coordLabelLeft.visible = false
 				
 		if (right):
-			if (j + 1 <= window_size.x): 
-				rect2.visible = true
-				coordLabel2.visible = true
-				update_position(functionValues[j], rect2, coordLabel2)
+			if (rightPosition + 1 <= window_size.x): 
+				rectRight.visible = true
+				coordLabelRight.visible = true
+				update_position(functionValues[rightPosition], rectRight, coordLabelRight)
 			else:
-				rect2.visible = false
-				coordLabel2.visible = false
-		if(coordLabel != null && coordLabel2 != null && coordLabel.position.x + coordLabel.size.x > coordLabel2.position.x && coordLabel.position.y < coordLabel2.position.y + coordLabel2.size.y):
-			coordLabel2.position.y = coordLabel2.position.y - coordLabel2.size.y
-			coordLabel2.check_coords()
-		distanceFromLimit -= stepSize
-		i += stepSize
-		j -= stepSize
-		if(left): animProgLeft = i
-		if(right): animProgRight = j
+				rectRight.visible = false
+				coordLabelRight.visible = false
+		
+		if(coordLabelLeft != null && coordLabelRight != null && coordLabelLeft.position.x + coordLabelLeft.size.x > coordLabelRight.position.x && coordLabelLeft.position.y < coordLabelRight.position.y + coordLabelRight.size.y):
+			coordLabelRight.position.y = coordLabelRight.position.y - coordLabelRight.size.y
+			coordLabelRight.check_coords()
+		distanceFromLimit -= speed
+		leftPosition += speed
+		rightPosition -= speed
+		
+		if(left): animProgLeft = leftPosition
+		if(right): animProgRight = rightPosition
 		queue_redraw()
-		await get_tree().create_timer(speed).timeout
 		
-		# what percent of animation is done
-		var percent_done = 1 - (distanceFromLimit / initialDistanceFromLimit)
-		
-		stepSize = clampi(5 - ((percent_done - 0.6) * 10), 1, 5)
-		print(percent_done)
-		print(stepSize)
-
-		speed = initialSpeed * speed_multiplier
-		
-		
-	# Stop drawing
-	animating = false
-	$AnimationControls.visible = false
-	if(left): 
-		rect.queue_free()
-		coordLabel.queue_free()
-	if(right):
-		rect2.queue_free()
-		coordLabel2.queue_free()
-	limit_point.queue_free()
-	animProgLeft = Util.convert_to_real_coords(origin, Vector2(-1,0)).x
-	animProgRight = Util.convert_to_real_coords(origin, Vector2(200000,0)).x
-	functionLines.clear()
-	queue_redraw()
-	pause = false
-	animating = false
-
+	else:
+		print("Stopped")
+		stop_animate_limit()
 	
+
+
 # using limit definition of derivative
 # f'(x) = lim_{h->0} ( f(x+h) - f(x) ) / h
 func animate_derivative(x: float):
@@ -406,7 +424,7 @@ func animate_Integral(type: String, left_bound: float, right_bound: float, expr:
 
 		queue_redraw()
 		if !pause:
-			await get_tree().create_timer(speed * speed_multiplier).timeout
+			await get_tree().create_timer(speed / speed_multiplier).timeout
 		else:
 			await get_tree().create_timer(0.001).timeout
 		rectangles.clear()
@@ -445,7 +463,7 @@ func _on_back_pressed() -> void:
 
 
 func _on_speed_up_pressed() -> void:
-	speed_multiplier = clampf(speed_multiplier * 0.75, 0.0563135147, 57.6650390625)
+	speed_multiplier = clampf(speed_multiplier * 2, 0.00390625, 256)
 
 func _on_slow_down_pressed() -> void:
-	speed_multiplier = clampf(speed_multiplier * 1.5, 0.0563135147, 57.6650390625)
+	speed_multiplier = clampf(speed_multiplier * 0.5, 0.00390625, 256)

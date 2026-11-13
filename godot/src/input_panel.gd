@@ -358,8 +358,6 @@ func _on_animate_pressed() -> void:
 				limit_val,
 				data["function_values"],
 				from_left, from_right,
-				0.02,   # initial seconds-per-step
-				.99   # slow-down factor per 1%, after the first 50%
 			)
 
 		AnimType.DERIVATIVE:
