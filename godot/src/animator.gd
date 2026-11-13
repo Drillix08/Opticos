@@ -37,9 +37,13 @@ var rectangles: Array[Rect2]
 
 var labelOffset = 0
 
+var elapsed := 0.0
+var last_frame := 0
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass
+	last_frame = Engine.get_physics_frames()
+	
 	
 	
 func _draw() -> void:
@@ -74,10 +78,16 @@ func _draw() -> void:
 	for line in functionLines:
 		if(line[0].x < animProgLeft || line[1].x > animProgRight): draw_line(line[0], line[1], lineColor, 2)
 		else: draw_line(line[0], line[1], functionColor, 2)
+		
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	pass
+	elapsed += _delta
+	if elapsed > 1.0:
+		var current_frame := Engine.get_physics_frames()
+		#print((current_frame - last_frame) / elapsed)
+		last_frame = current_frame
+		elapsed = 0.0
 
 func prepare_to_animate(_function_values: Array[Vector2], _origin: Vector2, _grid_spacing: int, _functionLines: Array[Array]):
 	functionValues = _function_values
@@ -101,6 +111,7 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 	var endpoint: float = Util.convert_to_godot_coords(origin, Vector2(limit*grid_spacing,0)).x
 	if(endpoint < 0 || endpoint > window_size.x): return
 	if(endpoint < 0): return
+	
 	#step -= 1
 	animating = true
 	$AnimationControls.visible = true
@@ -116,7 +127,7 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 			add_child(limit_point)
 			break
 
-	speed = 0.001
+	
 
 	var rect: TextureRect = null
 	var rect2: TextureRect = null
@@ -140,12 +151,16 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 		add_child(rect2)
 		coordLabel2 = CoordLabel.new()
 		add_child(coordLabel2)
-	var distanceFromLimit = max(endpoint, abs(window_size.x - endpoint))
-	var i: int = endpoint - distanceFromLimit
-	var j: int = endpoint + distanceFromLimit
+	var initialDistanceFromLimit = max(endpoint, abs(window_size.x - endpoint))
+	var distanceFromLimit = initialDistanceFromLimit
+	var i: int = endpoint - initialDistanceFromLimit
+	var j: int = endpoint + initialDistanceFromLimit
+	var initialSpeed = speed
+	var stepSize = 5
 
 	while(i <= endpoint):
 		if(i == endpoint): _on_play_pause_pressed()
+		
 		#Paused stuff
 		if(pause):
 			var action: int = await step_frame
@@ -156,6 +171,7 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 				if(i != endpoint):
 					j += 1
 					i -= 1
+					
 		#updating positions
 		if (left):
 			if (i >= 0): 
@@ -165,6 +181,7 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 			else:
 				rect.visible = false
 				coordLabel.visible = false
+				
 		if (right):
 			if (j + 1 <= window_size.x): 
 				rect2.visible = true
@@ -176,13 +193,25 @@ func animate_Limit(limit: float, points: Array[Vector2], left: bool, right: bool
 		if(coordLabel != null && coordLabel2 != null && coordLabel.position.x + coordLabel.size.x > coordLabel2.position.x && coordLabel.position.y < coordLabel2.position.y + coordLabel2.size.y):
 			coordLabel2.position.y = coordLabel2.position.y - coordLabel2.size.y
 			coordLabel2.check_coords()
-		i += 1
-		j -= 1
+		distanceFromLimit -= stepSize
+		i += stepSize
+		j -= stepSize
 		if(left): animProgLeft = i
 		if(right): animProgRight = j
 		queue_redraw()
-		await get_tree().create_timer(speed * speed_multiplier).timeout
-		speed = clampf(speed * rate, 0.00001, 8)
+		await get_tree().create_timer(speed).timeout
+		
+		# what percent of animation is done
+		var percent_done = 1 - (distanceFromLimit / initialDistanceFromLimit)
+		
+		stepSize = clampi(5 - ((percent_done - 0.6) * 10), 1, 5)
+		print(percent_done)
+		print(stepSize)
+
+		speed = initialSpeed * speed_multiplier
+		
+		
+	# Stop drawing
 	animating = false
 	$AnimationControls.visible = false
 	if(left): 
@@ -416,9 +445,7 @@ func _on_back_pressed() -> void:
 
 
 func _on_speed_up_pressed() -> void:
-	speed_multiplier = clampf(speed_multiplier * 0.5, 0.00390625, 256.0)
-	print(speed_multiplier)
+	speed_multiplier = clampf(speed_multiplier * 0.75, 0.0563135147, 57.6650390625)
 
 func _on_slow_down_pressed() -> void:
-	speed_multiplier = clampf(speed_multiplier * 2.0, 0.00390625, 256.0) 
-	print(speed_multiplier)
+	speed_multiplier = clampf(speed_multiplier * 1.5, 0.0563135147, 57.6650390625)

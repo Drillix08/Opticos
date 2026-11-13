@@ -110,6 +110,10 @@ ReturnToTitle={
 ]
 }
 
+[physics]
+
+common/physics_ticks_per_second=144
+
 [rendering]
 
 environment/defaults/default_clear_color=Color(0.8156863, 1, 1, 1)
