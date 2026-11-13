@@ -1,38 +1,32 @@
 extends Node
 
-@export var linepixel: PackedScene
+@export var linedrawer: PackedScene
 
 var title_screen = "res://assets/title_screen/title_screen.tscn"
-
-const LINEDRAW_STARTPOS = Vector3(8.0, 8.0, 8.0)
-const LINEDRAW_ENDPOS = Vector3(-8.0, -8.0, -8.0)
-const LINEDRAW_MOVEMENT = Vector3(-0.2, -0.2, -0.2)
+var ld = null
 
 
-func spawn_linepixel():
-	var lp = linepixel.instantiate()
-	lp.init($LineDrawer.position)
-	add_child(lp)
-
-
-func vec3_not_equal(v1: Vector3, v2: Vector3):
-	const FP_MARGIN = 0.001
-	return abs(v1.x - v2.x) > FP_MARGIN \
-			or abs(v1.y - v2.y) > FP_MARGIN \
-			or abs(v1.z - v2.z) > FP_MARGIN
+func init_line_drawer():
+	ld = linedrawer.instantiate()
+	add_child(ld)
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	$LineDrawer.position = LINEDRAW_STARTPOS
-	spawn_linepixel()
+	init_line_drawer()
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
-	if Input.is_action_just_pressed("ReturnToTitle"):
-		get_tree().change_scene_to_file(title_screen)
+	if Input.is_action_just_pressed("OpenMenu"):
+		$OptionsPanel.visible = not $OptionsPanel.visible
 
-	if vec3_not_equal($LineDrawer.position, LINEDRAW_ENDPOS):
-		$LineDrawer.position += LINEDRAW_MOVEMENT
-		spawn_linepixel()
+
+func _on_exit_button_pressed():
+	get_tree().change_scene_to_file(title_screen)
+
+
+func _on_redraw_button_pressed():
+	if ld != null:
+		ld.queue_free()
+		init_line_drawer()

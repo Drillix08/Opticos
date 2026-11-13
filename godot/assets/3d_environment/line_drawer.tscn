@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://c50tsyael01td"]
+
+[ext_resource type="Script" uid="uid://du5frvjnhnqlu" path="res://assets/3d_environment/line_drawer.gd" id="1_nil00"]
+[ext_resource type="PackedScene" uid="uid://dr2ugm6hjg125" path="res://assets/3d_environment/line_pixel.tscn" id="2_te6pe"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_vmgj2"]
+
+[node name="LineDrawer" type="Node3D" unique_id=914895846]
+script = ExtResource("1_nil00")
+linepixel = ExtResource("2_te6pe")
+
+[node name="PixelDrawer" type="MeshInstance3D" parent="." unique_id=1100615630]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, 0)
+mesh = SubResource("BoxMesh_vmgj2")
