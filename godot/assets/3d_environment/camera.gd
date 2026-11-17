@@ -13,6 +13,7 @@ const MIN_ORBIT_RADIUS = 2.0
 const MAX_ORBIT_RADIUS = 16.0
 const MOUSE_SENS_FREE_FLY = 0.5
 const MOUSE_SENS_ORBIT = 0.6
+const SCROLL_SPEED = 20.0
 
 enum {
 	MODE_FREE_FLY = 0,
@@ -53,7 +54,7 @@ func _process(delta: float):
 
 
 func camera_free_fly(delta: float):
-	$Label.text = "Mode: Free Fly"
+	$FlightModeLabel.text = "Mode: Free Fly"
 
 	if Input.is_action_pressed("MoveForward"):
 		position.z -= cos(rotation.y) * MOVE_SPEED * delta
@@ -94,12 +95,16 @@ func camera_free_fly(delta: float):
 
 
 func camera_orbit(delta: float):
-	$Label.text = "Mode: Orbit"
+	$FlightModeLabel.text = "Mode: Orbit"
 
 	if Input.is_action_pressed("FlyUp"):
 		orbit_radius = max(MIN_ORBIT_RADIUS, orbit_radius - ZOOM_SPEED * delta)
 	if Input.is_action_pressed("FlyDown"):
 		orbit_radius = min(MAX_ORBIT_RADIUS, orbit_radius + ZOOM_SPEED * delta)
+	if Input.is_action_just_pressed("MouseScrollUp"):
+		orbit_radius = max(MIN_ORBIT_RADIUS, orbit_radius - SCROLL_SPEED * delta)
+	if Input.is_action_just_pressed("MouseScrollDown"):
+		orbit_radius = min(MAX_ORBIT_RADIUS, orbit_radius + SCROLL_SPEED * delta)
 
 	if Input.is_action_pressed("LookLeft"):
 		orbit_angle -= ORBIT_SPEED * delta
