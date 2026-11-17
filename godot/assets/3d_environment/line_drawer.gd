@@ -6,6 +6,9 @@ const LINEDRAW_STARTPOS = Vector3(8.0, 8.0, 8.0)
 const LINEDRAW_ENDPOS = Vector3(-8.0, -8.0, -8.0)
 const LINEDRAW_MOVEMENT = Vector3(-0.2, -0.2, -0.2)
 
+var max_delay
+var delay
+
 
 func vec3_not_equal(v1: Vector3, v2: Vector3):
 	const FP_MARGIN = 0.001
@@ -20,6 +23,11 @@ func spawn_linepixel():
 	add_child(lp)
 
 
+func init(md):
+	max_delay = md
+	delay = max_delay
+
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	$PixelDrawer.position = LINEDRAW_STARTPOS
@@ -27,7 +35,11 @@ func _ready():
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta):
+func _process(delta):
 	if vec3_not_equal($PixelDrawer.position, LINEDRAW_ENDPOS):
-		$PixelDrawer.position += LINEDRAW_MOVEMENT
-		spawn_linepixel()
+		if delay <= 0.0:
+			$PixelDrawer.position += LINEDRAW_MOVEMENT
+			spawn_linepixel()
+			delay += max_delay
+		else:
+			delay -= delta
