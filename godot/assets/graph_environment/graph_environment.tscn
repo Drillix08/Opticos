@@ -42,7 +42,7 @@ script = ExtResource("2_tlnqj")
 
 [node name="PlayPause" type="Button" parent="Control/Animator/AnimationControls" unique_id=565883921]
 layout_mode = 2
-text = "pause"
+text = "Pause"
 
 [node name="Next" type="Button" parent="Control/Animator/AnimationControls" unique_id=782377964]
 layout_mode = 2
@@ -59,6 +59,10 @@ text = ">>"
 [node name="SlowDown" type="Button" parent="Control/Animator/AnimationControls" unique_id=1994145305]
 layout_mode = 2
 text = "<<"
+
+[node name="FinishButton" type="Button" parent="Control/Animator/AnimationControls" unique_id=329427742]
+layout_mode = 2
+text = "Finish"
 
 [node name="InputPanel" type="Control" parent="Control" unique_id=1218166971]
 anchors_preset = 0
@@ -77,3 +81,4 @@ script = ExtResource("5_juirp")
 [connection signal="pressed" from="Control/Animator/AnimationControls/Back" to="Control/Animator" method="_on_back_pressed"]
 [connection signal="pressed" from="Control/Animator/AnimationControls/SpeedUp" to="Control/Animator" method="_on_speed_up_pressed"]
 [connection signal="pressed" from="Control/Animator/AnimationControls/SlowDown" to="Control/Animator" method="_on_slow_down_pressed"]
+[connection signal="pressed" from="Control/Animator/AnimationControls/FinishButton" to="Control/Animator" method="_on_finish_button_pressed"]

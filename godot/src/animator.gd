@@ -21,19 +21,22 @@ var gridline_thickness :float = 1.0
 var functionValues: Array[Vector2] = [Vector2(-1, -1)]
 var functionLines: Array[Array]
 var animProgLeft: float = Util.convert_to_real_coords(origin, Vector2(-1,0)).x
-var animProgRight: float = Util.convert_to_real_coords(origin, Vector2(200000,0)).x
+var animProgRight: float = Util.convert_to_real_coords(origin, Vector2(window_width + 1,0)).x
 
 var pause: bool = false
 var frameOffset: int = 0
 
+var finished = true
+
 # for limit
 var animating_limit = false
-var limit: float
-var points: Array[Vector2]
+var endpoint: float
+var initialDistanceFromLimit: float
+var distanceFromLimit: float
 var left: bool
-var leftPosition: int = -1
+var leftPosition: float = -1
 var right: bool
-var rightPosition: int = -1
+var rightPosition: float = -1
 var limit_point: TextureRect = null
 var rectLeft: TextureRect = null
 var rectRight: TextureRect = null
@@ -41,17 +44,19 @@ var coordLabelLeft: CoordLabel = null
 var coordLabelRight: CoordLabel = null
 
 # for derivative
+var animating_derivative = false
 var secant_line_left: Vector2 = Vector2(0, 0)
 var secant_line_right: Vector2 = Vector2(0, 0)
 
 # for integration
+var animating_integral = false
 var rectangles: Array[Rect2]
 
 var labelOffset = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass
+	$AnimationControls.visible = false
 
 
 func _draw() -> void:
@@ -90,6 +95,7 @@ func _draw() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
+	animating = animating_limit || animating_derivative || animating_integral
 	if (pause):
 		pass
 	else:
@@ -112,18 +118,31 @@ func update_position(point: Vector2, rect: TextureRect, label: CoordLabel):
 
 ## Function for animating values approaching a limit from left and/or right position
 ## initially at [code]speed[/code] seconds per point slowing at a rate of [code]rate[/code] per point
-func animate_Limit(_limit: float, _points: Array[Vector2], _left: bool, _right: bool):
+func animate_Limit(_limit: float, _left: bool, _right: bool):
+	if (!finished): return
 	if (!_right && !_left): return
+	finished = false
 	
-	animating = true
+	endpoint = Util.convert_to_godot_coords(origin, Vector2(_limit*grid_spacing,0)).x
+	if (endpoint < 0 || endpoint > window_size.x): return
+	
+	initialDistanceFromLimit = max(endpoint, abs(window_size.x - endpoint))
+	distanceFromLimit = initialDistanceFromLimit
+	
 	animating_limit = true;
 	$AnimationControls.visible = true
-	limit = _limit
-	points = _points
+	$AnimationControls/FinishButton.visible = false
 	left = _left
 	right = _right
 	
+	leftPosition = endpoint - initialDistanceFromLimit
+	rightPosition = endpoint + initialDistanceFromLimit
+	
 	limit_point = TextureRect.new()
+	limit_point.texture = load("res://assets/graph_environment/black_circle.png")
+	limit_point.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	limit_point.size = Vector2(20, 20)
+	limit_point.position = functionValues[endpoint] - Vector2(10, 10)
 	add_child(limit_point)
 	
 	rectLeft = TextureRect.new()
@@ -137,12 +156,13 @@ func animate_Limit(_limit: float, _points: Array[Vector2], _left: bool, _right: 
 	add_child(coordLabelRight)
 
 func stop_animate_limit():
-	animating = false
+	finished = true
+	
 	$AnimationControls.visible = false
 	animating_limit = false;
 	pause = false;
 	animProgLeft = Util.convert_to_real_coords(origin, Vector2(-1,0)).x
-	animProgRight = Util.convert_to_real_coords(origin, Vector2(200000,0)).x
+	animProgRight = Util.convert_to_real_coords(origin, Vector2(window_width + 1,0)).x
 	functionLines.clear()
 	leftPosition = -1
 	rightPosition = -1
@@ -160,21 +180,7 @@ func stop_animate_limit():
 	coordLabelRight = null
 
 func animate_Limit_Step():
-	var endpoint: float = Util.convert_to_godot_coords(origin, Vector2(limit*grid_spacing,0)).x
-	if(endpoint < 0 || endpoint > window_size.x): 
-		stop_animate_limit()
-		return
-	
-	#step -= 1
-	for coords in points:
-		if coords.x == endpoint:
-			limit_point.texture = load("res://assets/graph_environment/black_circle.png")
-			limit_point.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			limit_point.size = Vector2(20, 20)
-			limit_point.position = coords - Vector2(10, 10)
-			#print("position: " + str(limit_point.position))
-			break
-
+	# draw the circles for the two ends
 	if(left): 
 		rectLeft.texture = load("res://assets/graph_environment/yellow_circle.png")
 		rectLeft.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -184,33 +190,12 @@ func animate_Limit_Step():
 		rectRight.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		rectRight.size = Vector2(10, 10)
 	
-	var initialDistanceFromLimit = max(endpoint, abs(window_size.x - endpoint))
-	var distanceFromLimit = initialDistanceFromLimit
-	if (leftPosition == -1):
-		leftPosition = endpoint - initialDistanceFromLimit
-	else:
-		distanceFromLimit = endpoint - leftPosition
-	if (rightPosition == -1):
-		rightPosition = endpoint + initialDistanceFromLimit
-	
 	var percent_done = 1 - (distanceFromLimit / initialDistanceFromLimit)
-	print(percent_done)
-	var speed = (1) * speed_multiplier
+	var speed = (1 - clampf((percent_done * 10) - 9, 0.0, 0.995)) * speed_multiplier
 
 	if(leftPosition <= endpoint):
 		if(leftPosition == endpoint): _on_play_pause_pressed()
 		
-		#Paused stuff
-		if(pause):
-			var action: int = await step_frame
-			if(action == -1): #back
-				leftPosition -= 2
-				rightPosition += 2
-			elif(action == 0): #Play
-				if(leftPosition != endpoint):
-					leftPosition -= 1
-					rightPosition += 1
-					
 		#updating positions
 		if (left):
 			if (leftPosition >= 0): 
@@ -230,9 +215,11 @@ func animate_Limit_Step():
 				rectRight.visible = false
 				coordLabelRight.visible = false
 		
+		# Keeps the coordinate labels from overlapping
 		if(coordLabelLeft != null && coordLabelRight != null && coordLabelLeft.position.x + coordLabelLeft.size.x > coordLabelRight.position.x && coordLabelLeft.position.y < coordLabelRight.position.y + coordLabelRight.size.y):
 			coordLabelRight.position.y = coordLabelRight.position.y - coordLabelRight.size.y
 			coordLabelRight.check_coords()
+		
 		distanceFromLimit -= speed
 		leftPosition += speed
 		rightPosition -= speed
@@ -240,17 +227,15 @@ func animate_Limit_Step():
 		if(left): animProgLeft = leftPosition
 		if(right): animProgRight = rightPosition
 		queue_redraw()
-		
 	else:
-		print("Stopped")
-		stop_animate_limit()
-	
+		animating_limit = false
+		$AnimationControls/FinishButton.visible = true
 
 
 # using limit definition of derivative
 # f'(x) = lim_{h->0} ( f(x+h) - f(x) ) / h
 func animate_derivative(x: float):
-	animating = true
+	animating_derivative = true
 	$AnimationControls.visible = true
 	
 	# display box for equation of line
@@ -449,21 +434,26 @@ func animate_Integral(type: String, left_bound: float, right_bound: float, expr:
 	
 func _on_play_pause_pressed() -> void:
 	pause = !pause
-	if(!pause): 
-		step_frame.emit(0)
+	if(!pause):
 		$AnimationControls/PlayPause.text = "Pause"
-	else:
+	elif (pause):
 		$AnimationControls/PlayPause.text = "Play"
 
 func _on_next_pressed() -> void:
+	if (animating_limit):
+			animate_Limit_Step()
 	step_frame.emit(1)
 
 func _on_back_pressed() -> void:
+	if (animating_limit):
+			animate_Limit_Step()
 	step_frame.emit(-1)
 
+func _on_finish_button_pressed() -> void:
+	stop_animate_limit()
 
 func _on_speed_up_pressed() -> void:
-	speed_multiplier = clampf(speed_multiplier * 2, 0.00390625, 256)
+	speed_multiplier = clampf(speed_multiplier * 2, 0.015625, 64)
 
 func _on_slow_down_pressed() -> void:
-	speed_multiplier = clampf(speed_multiplier * 0.5, 0.00390625, 256)
+	speed_multiplier = clampf(speed_multiplier * 0.5, 0.015625, 64)

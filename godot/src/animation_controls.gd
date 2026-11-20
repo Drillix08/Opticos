@@ -8,6 +8,7 @@ func _ready() -> void:
 	$Back.position = Vector2($PlayPause.position.x - ($Back.size.x * 0.5) - ($PlayPause.size.x * 0.25), 12)
 	$SpeedUp.position = Vector2($PlayPause.position.x - ($SpeedUp.size.x * 0.5) + ($Next.size.x * 1.5) + ($PlayPause.size.x * 1.25), 12)
 	$SlowDown.position = Vector2($PlayPause.position.x - ($SlowDown.size.x * 0.5) - ($Back.size.x * 1.5) - ($PlayPause.size.x * 0.25), 12)
+	$FinishButton.position = Vector2(get_viewport_rect().size.x * 0.5 - ($FinishButton.size.x * 0.5), 16 + $PlayPause.size.y)
 	
 	
 

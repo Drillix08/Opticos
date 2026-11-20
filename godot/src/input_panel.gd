@@ -356,7 +356,6 @@ func _on_animate_pressed() -> void:
 			var from_right: bool   = _from_right_check.button_pressed
 			_animator.animate_Limit(
 				limit_val,
-				data["function_values"],
 				from_left, from_right,
 			)
 
